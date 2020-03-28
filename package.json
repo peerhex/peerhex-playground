@@ -5,7 +5,9 @@
   "dependencies": {
     "@deck.gl/aggregation-layers": "^8.1.1",
     "@deck.gl/core": "^8.1.1",
+    "@deck.gl/geo-layers": "^8.1.1",
     "@deck.gl/layers": "^8.1.1",
+    "@deck.gl/mesh-layers": "^8.1.1",
     "@deck.gl/react": "^8.1.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
