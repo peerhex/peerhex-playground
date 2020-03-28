@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import styled from 'styled-components'
 import LineLayerExample from './line-layer/LineLayerExample'
 import ThreeDHeatmap from './3d-heatmap/ThreeDHeatmap'
 import H3Hexagon from './h3-hexagon/H3Hexagon'
@@ -8,25 +9,33 @@ function Home () {
   return <h2>Home</h2>
 }
 
+const StyledList = styled.ul`
+  display: flex;
+`
+const StyledItem = styled.li`
+	display: block;
+	margin: 0 0.5rem;
+`
+
 export default function App () {
   return (
     <Router>
       <div>
         <nav>
-          <ul>
-            <li>
+          <StyledList>
+            <StyledItem>
               <Link to='/'>Home</Link>
-            </li>
-            <li>
+            </StyledItem>
+            <StyledItem>
               <Link to='/line-layer'>Line Layer</Link>
-            </li>
-            <li>
+            </StyledItem>
+            <StyledItem>
               <Link to='/3d-heatmap'>3D Heatmap</Link>
-            </li>
-            <li>
+            </StyledItem>
+            <StyledItem>
               <Link to='/h3-hexagon'>H3 Hexagon</Link>
-            </li>
-          </ul>
+            </StyledItem>
+          </StyledList>
         </nav>
         <Switch>
           <Route path='/line-layer'>

@@ -45,7 +45,7 @@ const INITIAL_VIEW_STATE = {
   latitude: 37.79443733047938,
   longitude: -122.43654714543031,
   zoom: 10.309433544500877,
-  minZoom: 5,
+  minZoom: 1,
   maxZoom: 15,
   pitch: 44.56258060163604,
   bearing: -23.690792231381856
