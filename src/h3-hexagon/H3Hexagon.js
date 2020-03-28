@@ -1,13 +1,18 @@
 import React, { Component, useState, useEffect } from 'react'
 import { StaticMap } from 'react-map-gl'
-import { AmbientLight, PointLight, LightingEffect, MapView } from '@deck.gl/core'
+import {
+  AmbientLight,
+  PointLight,
+  LightingEffect,
+  MapView
+} from '@deck.gl/core'
 import { H3HexagonLayer } from '@deck.gl/geo-layers'
 import DeckGL from '@deck.gl/react'
 import { json } from 'd3-fetch'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import { color as d3Color } from 'd3-color'
 import { geoToH3 } from 'h3-js'
-import pushable from 'it-pushable'
+import produce from 'immer'
 
 // Set your mapbox token here
 const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
@@ -50,7 +55,7 @@ const INITIAL_VIEW_STATE = {
   longitude: -122.43654714543031,
   zoom: 10.309433544500877,
   minZoom: 1,
-  maxZoom: 15,
+  maxZoom: 20,
   pitch: 44.56258060163604,
   bearing: -23.690792231381856
 }
@@ -65,8 +70,8 @@ const colorRange = [
 ]
 
 const colors = schemeCategory10.map(colorName => {
-  const {r,g,b} = d3Color(colorName)
-  return [r,g,b]
+  const { r, g, b } = d3Color(colorName)
+  return [r, g, b]
 })
 
 const elevationScale = { min: 1, max: 50 }
@@ -152,7 +157,7 @@ class H3HexagonView extends Component {
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
         onClick={this.onClick.bind(this)}
-        views={new MapView({repeat: true})}
+        views={new MapView({ repeat: true })}
       >
         <StaticMap
           reuseMaps
@@ -175,7 +180,6 @@ class H3HexagonView extends Component {
 
 export default function H3Hexagon () {
   const [resolution, setResolution] = useState(8)
-  const [source, setSource] = useState(pushable())
   const [data, setData] = useState([])
   const [nextColor, setNextColor] = useState(0)
   useEffect(() => {
@@ -188,7 +192,6 @@ export default function H3Hexagon () {
       }
       setNextColor(colorIndex)
       setData(data)
-      source.push(data)
     })
   }, [])
 
@@ -197,21 +200,28 @@ export default function H3Hexagon () {
     const colorIndex = nextColor % 10
     const newDataPoint = {
       hex,
-      count: (9 - resolution) * 10,
+      // count: 30 * (9.682 - Math.log((resolution + 1) * 1000)),
+      count:
+        1000 * (1 / Math.log((resolution + 2) * (resolution + 2)) / 10) - 17.5,
       colorIndex
     }
     setNextColor(colorIndex + 1)
-    data.push(newDataPoint)
-    source.push([newDataPoint])
+    const nextData = produce(data, draft => {
+      draft.push(newDataPoint)
+    })
+    setData(nextData)
   }
 
   function removeHex (hexToRemove) {
     console.log('Jim removeHex', hexToRemove)
-    const newData = data.filter(({ hex }) => hex !== hexToRemove)
-    const source = pushable()
-    source.push(newData)
-    setSource(source)
-    setData(newData)
+    const nextData = produce(data, draft => {
+      draft.splice(
+        0,
+        draft.length,
+        ...draft.filter(({ hex }) => hex !== hexToRemove)
+      )
+    })
+    setData(nextData)
   }
 
   function handleChange (event) {
@@ -220,22 +230,32 @@ export default function H3Hexagon () {
 
   return (
     <div>
-      Resolution: <select onChange={handleChange} value={resolution}>
-        <option value="0">0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
+      Resolution:{' '}
+      <select onChange={handleChange} value={resolution}>
+        <option value='0'>0</option>
+        <option value='1'>1</option>
+        <option value='2'>2</option>
+        <option value='3'>3</option>
+        <option value='4'>4</option>
+        <option value='5'>5</option>
+        <option value='6'>6</option>
+        <option value='7'>7</option>
+        <option value='8'>8</option>
+        <option value='9'>9</option>
+        <option value='10'>10</option>
+        <option value='11'>11</option>
+        <option value='12'>12</option>
+        <option value='13'>13</option>
+        <option value='14'>14</option>
+        <option value='15'>15</option>
       </select>
       <div style={{ position: 'relative', height: '80vh' }}>
-        <H3HexagonView data={source} pushLatLng={pushLatLng} removeHex={removeHex}/>
+        <H3HexagonView
+          data={data}
+          pushLatLng={pushLatLng}
+          removeHex={removeHex}
+        />
       </div>
     </div>
   )
-
 }
