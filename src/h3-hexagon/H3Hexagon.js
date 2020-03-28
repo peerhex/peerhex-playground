@@ -4,6 +4,8 @@ import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core'
 import { H3HexagonLayer } from '@deck.gl/geo-layers'
 import DeckGL from '@deck.gl/react'
 import { json } from 'd3-fetch'
+import { geoToH3 } from 'h3-js'
+import pushable from 'it-pushable'
 
 // Set your mapbox token here
 const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
@@ -120,6 +122,9 @@ class H3HexagonView extends Component {
           /* Update tooltip
            http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
         */
+        },
+        onClick: info => {
+          console.log('Jim click', info)
         }
       })
     ]
@@ -134,6 +139,7 @@ class H3HexagonView extends Component {
         effects={[lightingEffect]}
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
+        onClick={this.onClick.bind(this)}
       >
         <StaticMap
           reuseMaps
@@ -144,21 +150,55 @@ class H3HexagonView extends Component {
       </DeckGL>
     )
   }
+
+  onClick (info) {
+    console.log('Jim onClick deckgl', info)
+    const {
+      lngLat: [lng, lat]
+    } = info
+    this.props.pushLatLng(lat, lng)
+  }
 }
 
 export default function H3Hexagon () {
-  const [data, setData] = useState()
+  const [resolution, setResolution] = useState(8)
+  const [source] = useState(pushable())
   useEffect(() => {
     console.log('Jim loading')
-    json(DATA_URL).then(data => setData(data))
+    json(DATA_URL).then(data => source.push(data))
   }, [])
-  if (!data) {
-    return <div>Loading...</div>
+
+  function pushLatLng (lat, lng) {
+    const hex = geoToH3(lat, lng, resolution)
+    source.push([
+      {
+        hex,
+        count: 20
+      }
+    ])
+  }
+
+  function handleChange (event) {
+    setResolution(Number(event.target.value))
   }
 
   return (
-    <div style={{ position: 'relative', height: '80vh' }}>
-      <H3HexagonView data={data} />
+    <div>
+      <select onChange={handleChange} value={resolution}>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+      <div style={{ position: 'relative', height: '80vh' }}>
+        <H3HexagonView data={source} pushLatLng={pushLatLng} />
+      </div>
     </div>
   )
+
 }
