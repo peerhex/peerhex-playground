@@ -1,9 +1,11 @@
 import React, { Component, useState, useEffect } from 'react'
 import { StaticMap } from 'react-map-gl'
-import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core'
+import { AmbientLight, PointLight, LightingEffect, MapView } from '@deck.gl/core'
 import { H3HexagonLayer } from '@deck.gl/geo-layers'
 import DeckGL from '@deck.gl/react'
 import { json } from 'd3-fetch'
+import { schemeCategory10 } from 'd3-scale-chromatic'
+import { color as d3Color } from 'd3-color'
 import { geoToH3 } from 'h3-js'
 import pushable from 'it-pushable'
 
@@ -62,6 +64,11 @@ const colorRange = [
   [209, 55, 78]
 ]
 
+const colors = schemeCategory10.map(colorName => {
+  const {r,g,b} = d3Color(colorName)
+  return [r,g,b]
+})
+
 const elevationScale = { min: 1, max: 50 }
 
 class H3HexagonView extends Component {
@@ -115,7 +122,8 @@ class H3HexagonView extends Component {
         extruded: true,
         elevationScale: 20,
         getHexagon: d => d.hex,
-        getFillColor: d => [255, (1 - d.count / 500) * 255, 0],
+        // getFillColor: d => [255, (1 - d.count / 500) * 255, 0],
+        getFillColor: d => colors[d.colorIndex],
         getElevation: d => d.count,
         onHover: ({ object, x, y }) => {
           // const tooltip = `${object.hex} count: ${object.count}`
@@ -125,6 +133,10 @@ class H3HexagonView extends Component {
         },
         onClick: info => {
           console.log('Jim click', info)
+          if (info && info.object) {
+            this.props.removeHex(info.object.hex)
+            return true
+          }
         }
       })
     ]
@@ -140,6 +152,7 @@ class H3HexagonView extends Component {
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
         onClick={this.onClick.bind(this)}
+        views={new MapView({repeat: true})}
       >
         <StaticMap
           reuseMaps
@@ -162,20 +175,43 @@ class H3HexagonView extends Component {
 
 export default function H3Hexagon () {
   const [resolution, setResolution] = useState(8)
-  const [source] = useState(pushable())
+  const [source, setSource] = useState(pushable())
+  const [data, setData] = useState([])
+  const [nextColor, setNextColor] = useState(0)
   useEffect(() => {
     console.log('Jim loading')
-    json(DATA_URL).then(data => source.push(data))
+    json(DATA_URL).then(data => {
+      let colorIndex = nextColor
+      for (let item of data) {
+        item.colorIndex = colorIndex++ % 10
+        console.log('Jim item', item, schemeCategory10[item.colorIndex])
+      }
+      setNextColor(colorIndex)
+      setData(data)
+      source.push(data)
+    })
   }, [])
 
   function pushLatLng (lat, lng) {
     const hex = geoToH3(lat, lng, resolution)
-    source.push([
-      {
-        hex,
-        count: 20
-      }
-    ])
+    const colorIndex = nextColor % 10
+    const newDataPoint = {
+      hex,
+      count: (9 - resolution) * 10,
+      colorIndex
+    }
+    setNextColor(colorIndex + 1)
+    data.push(newDataPoint)
+    source.push([newDataPoint])
+  }
+
+  function removeHex (hexToRemove) {
+    console.log('Jim removeHex', hexToRemove)
+    const newData = data.filter(({ hex }) => hex !== hexToRemove)
+    const source = pushable()
+    source.push(newData)
+    setSource(source)
+    setData(newData)
   }
 
   function handleChange (event) {
@@ -184,7 +220,7 @@ export default function H3Hexagon () {
 
   return (
     <div>
-      <select onChange={handleChange} value={resolution}>
+      Resolution: <select onChange={handleChange} value={resolution}>
         <option value="0">0</option>
         <option value="1">1</option>
         <option value="2">2</option>
@@ -194,9 +230,10 @@ export default function H3Hexagon () {
         <option value="6">6</option>
         <option value="7">7</option>
         <option value="8">8</option>
+        <option value="9">9</option>
       </select>
       <div style={{ position: 'relative', height: '80vh' }}>
-        <H3HexagonView data={source} pushLatLng={pushLatLng} />
+        <H3HexagonView data={source} pushLatLng={pushLatLng} removeHex={removeHex}/>
       </div>
     </div>
   )
