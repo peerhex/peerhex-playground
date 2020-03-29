@@ -15,6 +15,7 @@ import { geoToH3 } from 'h3-js'
 import styled from 'styled-components'
 import produce from 'immer'
 import { useLocation } from 'react-router-dom'
+import throttle from 'lodash.throttle'
 
 const StyledA = styled.a`
   margin-left: 0.3rem;
@@ -124,8 +125,10 @@ class H3HexagonView extends Component {
 
   constructor (props) {
     super(props)
+    this.updateViewState = throttle(this._updateViewState.bind(this), 500)
     this.state = {
-      elevationScale: elevationScale.min
+      elevationScale: elevationScale.min,
+      viewState: {}
     }
   }
 
@@ -154,6 +157,19 @@ class H3HexagonView extends Component {
     ]
   }
 
+  _updateViewState (viewState) {
+    const nextViewState = produce(this.state.viewState, draft => {
+      for (const key in viewState) {
+        draft[key] = viewState[key]
+      }
+    })
+    if (nextViewState != this.state.viewState) {
+      console.log('Jim _updateViewState', nextViewState)
+      this.setState({ viewState: nextViewState })
+      this.props.setViewState(nextViewState)
+    }
+  }
+
   render () {
     const { mapStyle = 'mapbox://styles/mapbox/dark-v9' } = this.props
 
@@ -166,6 +182,7 @@ class H3HexagonView extends Component {
         onClick={this.onClick.bind(this)}
         views={new MapView({ repeat: true })}
       >
+        {({viewState}) => this.updateViewState(viewState)}
         <StaticMap
           reuseMaps
           mapStyle={mapStyle}
@@ -194,6 +211,7 @@ export default function H3Hexagon () {
     maxZoom: 20,
     minZoom: 1
   })
+  const [viewState, setViewState] = useState({})
 
   useEffect(() => {
     /*
@@ -288,6 +306,7 @@ export default function H3Hexagon () {
           <StyledA href='#hnd'>HND</StyledA>
           <StyledA href='#jfk'>JFK</StyledA>
           <StyledA href='#bom'>BOM</StyledA>
+          <StyledA href='#' onClick={flatten}>Flat</StyledA>
         </div>
       </div>
       <div style={{ position: 'relative', height: '80vh' }}>
@@ -296,8 +315,23 @@ export default function H3Hexagon () {
           initialViewState={initialViewState}
           pushLatLng={pushLatLng}
           removeHex={removeHex}
+          setViewState={setViewState}
         />
       </div>
     </div>
   )
+
+  function flatten (event) {
+    console.log('Jim flatten', viewState)
+    const initialViewState = {
+      ...viewState,
+      pitch: 0,
+      bearing: 0,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 1000
+    }
+    console.log('Jim flatten2', initialViewState)
+    setInitialViewState(initialViewState)
+    event.preventDefault()
+  }
 }
