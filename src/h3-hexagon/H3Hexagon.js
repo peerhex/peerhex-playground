@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react'
-import { StaticMap } from 'react-map-gl'
+import { StaticMap, FlyToInterpolator } from 'react-map-gl'
 import {
   AmbientLight,
   PointLight,
@@ -12,7 +12,13 @@ import { json } from 'd3-fetch'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import { color as d3Color } from 'd3-color'
 import { geoToH3 } from 'h3-js'
+import styled from 'styled-components'
 import produce from 'immer'
+import { useLocation } from 'react-router-dom'
+
+const StyledA = styled.a`
+  margin-left: 0.3rem;
+`
 
 // Set your mapbox token here
 const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
@@ -50,16 +56,6 @@ const material = {
   specularColor: [51, 51, 51]
 }
 
-const INITIAL_VIEW_STATE = {
-  latitude: 37.79443733047938,
-  longitude: -122.43654714543031,
-  zoom: 10.309433544500877,
-  minZoom: 1,
-  maxZoom: 20,
-  pitch: 44.56258060163604,
-  bearing: -23.690792231381856
-}
-
 const colorRange = [
   [1, 152, 189],
   [73, 227, 206],
@@ -76,6 +72,51 @@ const colors = schemeCategory10.map(colorName => {
 
 const elevationScale = { min: 1, max: 50 }
 
+const locations = {
+  sfo: {
+    latitude: 37.79443733047938,
+    longitude: -122.43654714543031,
+    zoom: 10.309433544500877,
+    pitch: 44.56258060163604,
+    bearing: -23.690792231381856
+  },
+  yvr: {
+    latitude: 49.17087900116923,
+    longitude: -122.92988500998378,
+    zoom: 9.141296450560473,
+    bearing: -0.3966745843230298,
+    pitch: 4.354578889623856
+  },
+  lhr: {
+    latitude: 51.498984876179385,
+    longitude: -0.1057782563021147,
+    zoom: 9.100393077982318,
+    bearing: -0.3966745843230298,
+    pitch: 4.354578889623856
+  },
+  hnd: {
+    latitude: 35.65413533768077,
+    longitude: 139.6114107561246,
+    zoom: 8.740076143620461,
+    bearing: -0.3966745843230298,
+    pitch: 4.354578889623856
+  },
+  jfk: {
+    latitude: 40.689201086853856,
+    longitude: -73.86562457283067,
+    zoom: 8.804948261063815,
+    bearing: -0.3966745843230298,
+    pitch: 4.354578889623856
+  },
+  bom: {
+    latitude: 18.988895831432906,
+    longitude: 72.95952634665996,
+    zoom: 10.06773829665424,
+    bearing: -0.3966745843230298,
+    pitch: 4.354578889623856
+  }
+}
+
 class H3HexagonView extends Component {
   static get defaultColorRange () {
     return colorRange
@@ -89,35 +130,9 @@ class H3HexagonView extends Component {
   }
 
   _renderLayers () {
-    const {
-      data,
-      radius = 1000,
-      upperPercentile = 100,
-      coverage = 1
-    } = this.props
+    const { data } = this.props
 
     return [
-      /*
-      new HexagonLayer({
-        id: 'heatmap',
-        colorRange,
-        coverage,
-        data,
-        elevationRange: [0, 3000],
-        elevationScale: data && data.length ? 50 : 0,
-        extruded: true,
-        getPosition: d => d,
-        onHover: this.props.onHover,
-        pickable: Boolean(this.props.onHover),
-        radius,
-        upperPercentile,
-        material,
-
-        transitions: {
-          elevationScale: 3000
-        }
-      })
-      */
       new H3HexagonLayer({
         id: 'h3-hexagon-layer',
         data,
@@ -127,17 +142,9 @@ class H3HexagonView extends Component {
         extruded: true,
         elevationScale: 20,
         getHexagon: d => d.hex,
-        // getFillColor: d => [255, (1 - d.count / 500) * 255, 0],
         getFillColor: d => colors[d.colorIndex],
         getElevation: d => d.count,
-        onHover: ({ object, x, y }) => {
-          // const tooltip = `${object.hex} count: ${object.count}`
-          /* Update tooltip
-           http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
-        */
-        },
         onClick: info => {
-          console.log('Jim click', info)
           if (info && info.object) {
             this.props.removeHex(info.object.hex)
             return true
@@ -154,7 +161,7 @@ class H3HexagonView extends Component {
       <DeckGL
         layers={this._renderLayers()}
         effects={[lightingEffect]}
-        initialViewState={INITIAL_VIEW_STATE}
+        initialViewState={this.props.initialViewState}
         controller={true}
         onClick={this.onClick.bind(this)}
         views={new MapView({ repeat: true })}
@@ -170,7 +177,6 @@ class H3HexagonView extends Component {
   }
 
   onClick (info) {
-    console.log('Jim onClick deckgl', info)
     const {
       lngLat: [lng, lat]
     } = info
@@ -182,18 +188,42 @@ export default function H3Hexagon () {
   const [resolution, setResolution] = useState(8)
   const [data, setData] = useState([])
   const [nextColor, setNextColor] = useState(0)
+  const location = useLocation()
+  const [initialViewState, setInitialViewState] = useState({
+    ...locations.sfo,
+    maxZoom: 20,
+    minZoom: 1
+  })
+
   useEffect(() => {
-    console.log('Jim loading')
+    /*
     json(DATA_URL).then(data => {
       let colorIndex = nextColor
       for (let item of data) {
         item.colorIndex = colorIndex++ % 10
-        console.log('Jim item', item, schemeCategory10[item.colorIndex])
       }
       setNextColor(colorIndex)
       setData(data)
     })
+    */
+    setData([])
   }, [])
+
+  useEffect(() => {
+    const key = location.hash.slice(1)
+    if (locations[key]) {
+      const initialViewState = {
+        ...locations[key],
+        transitionInterpolator: new FlyToInterpolator({
+          speed: 1.5
+        }),
+        transitionDuration: 'auto',
+        maxZoom: 20,
+        minZoom: 1
+      }
+      setInitialViewState(initialViewState)
+    }
+  }, [location])
 
   function pushLatLng (lat, lng) {
     const hex = geoToH3(lat, lng, resolution)
@@ -213,7 +243,6 @@ export default function H3Hexagon () {
   }
 
   function removeHex (hexToRemove) {
-    console.log('Jim removeHex', hexToRemove)
     const nextData = produce(data, draft => {
       draft.splice(
         0,
@@ -230,28 +259,41 @@ export default function H3Hexagon () {
 
   return (
     <div>
-      Resolution:{' '}
-      <select onChange={handleChange} value={resolution}>
-        <option value='0'>0</option>
-        <option value='1'>1</option>
-        <option value='2'>2</option>
-        <option value='3'>3</option>
-        <option value='4'>4</option>
-        <option value='5'>5</option>
-        <option value='6'>6</option>
-        <option value='7'>7</option>
-        <option value='8'>8</option>
-        <option value='9'>9</option>
-        <option value='10'>10</option>
-        <option value='11'>11</option>
-        <option value='12'>12</option>
-        <option value='13'>13</option>
-        <option value='14'>14</option>
-        <option value='15'>15</option>
-      </select>
+      <div style={{ display: 'flex' }}>
+        <div>
+          Resolution:{' '}
+          <select onChange={handleChange} value={resolution}>
+            <option value='0'>0 Global Region</option>
+            <option value='1'>1 Large Region</option>
+            <option value='2'>2 Medium Region</option>
+            <option value='3'>3 Small Region</option>
+            <option value='4'>4 Metro</option>
+            <option value='5'>5 City</option>
+            <option value='6'>6 Borough / Ward</option>
+            <option value='7'>7 Large Neighbourhood</option>
+            <option value='8'>8 Medium Neighbourhood</option>
+            <option value='9'>9 Small Neighbourhood</option>
+            <option value='10'>10 City Block</option>
+            <option value='11'>11 Large Building</option>
+            <option value='12'>12 Medium Building</option>
+            <option value='13'>13 Small Building / Shop</option>
+            <option value='14'>14 Group of People</option>
+            <option value='15'>15 Person</option>
+          </select>
+        </div>
+        <div>
+          <StyledA href='#sfo'>SFO</StyledA>
+          <StyledA href='#yvr'>YVR</StyledA>
+          <StyledA href='#lhr'>LHR</StyledA>
+          <StyledA href='#hnd'>HND</StyledA>
+          <StyledA href='#jfk'>JFK</StyledA>
+          <StyledA href='#bom'>BOM</StyledA>
+        </div>
+      </div>
       <div style={{ position: 'relative', height: '80vh' }}>
         <H3HexagonView
           data={data}
+          initialViewState={initialViewState}
           pushLatLng={pushLatLng}
           removeHex={removeHex}
         />
