@@ -133,7 +133,7 @@ class H3HexagonView extends Component {
 
   constructor (props) {
     super(props)
-    this.updateViewState = throttle(this._updateViewState.bind(this), 500)
+    this.updateViewState = throttle(this._updateViewState.bind(this), 1000)
     this.state = {
       elevationScale: elevationScale.min,
       viewState: {}
@@ -191,7 +191,6 @@ class H3HexagonView extends Component {
       }
     })
     if (nextViewState != this.state.viewState) {
-      console.log('Jim _updateViewState', nextViewState)
       this.setState({ viewState: nextViewState })
       this.props.setViewState(nextViewState)
     }
@@ -354,7 +353,6 @@ export default function H3HexagonTile () {
   )
 
   function flatten (event) {
-    console.log('Jim flatten', viewState)
     const initialViewState = {
       ...viewState,
       pitch: 0,
@@ -362,7 +360,6 @@ export default function H3HexagonTile () {
       transitionInterpolator: new FlyToInterpolator(),
       transitionDuration: 1000
     }
-    console.log('Jim flatten2', initialViewState)
     setInitialViewState(initialViewState)
     event.preventDefault()
   }

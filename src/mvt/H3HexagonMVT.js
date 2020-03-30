@@ -78,50 +78,50 @@ const locations = {
     latitude: 37.79443733047938,
     longitude: -122.43654714543031,
     zoom: 10.309433544500877,
-    pitch: 44.56258060163604,
-    bearing: -23.690792231381856
+    pitch: 0,
+    bearing: 0
   },
   yvr: {
     latitude: 49.17087900116923,
     longitude: -122.92988500998378,
     zoom: 9.141296450560473,
-    bearing: -0.3966745843230298,
-    pitch: 4.354578889623856
+    bearing: 0,
+    pitch: 0
   },
   lhr: {
     latitude: 51.498984876179385,
     longitude: -0.1057782563021147,
     zoom: 9.100393077982318,
-    bearing: -0.3966745843230298,
-    pitch: 4.354578889623856
+    bearing: 0,
+    pitch: 0
   },
   hnd: {
     latitude: 35.65413533768077,
     longitude: 139.6114107561246,
     zoom: 8.740076143620461,
-    bearing: -0.3966745843230298,
-    pitch: 4.354578889623856
+    bearing: 0,
+    pitch: 0
   },
   jfk: {
     latitude: 40.689201086853856,
     longitude: -73.86562457283067,
     zoom: 8.804948261063815,
-    bearing: -0.3966745843230298,
-    pitch: 4.354578889623856
+    bearing: 0,
+    pitch: 0
   },
   bom: {
     latitude: 18.988895831432906,
     longitude: 72.95952634665996,
     zoom: 10.06773829665424,
-    bearing: -0.3966745843230298,
-    pitch: 4.354578889623856
+    bearing: 0,
+    pitch: 0
   },
   tfn: {
     latitude: 28.32645764033052,
     longitude: -16.553379709316278,
     zoom: 8.249584835501196,
-    bearing: -0.3966745843230298,
-    pitch: 4.354578889623856,
+    bearing: 0,
+    pitch: 0
   }
 }
 
@@ -132,7 +132,7 @@ class H3HexagonView extends Component {
 
   constructor (props) {
     super(props)
-    this.updateViewState = throttle(this._updateViewState.bind(this), 500)
+    this.updateViewState = throttle(this._updateViewState.bind(this), 1000)
     this.state = {
       elevationScale: elevationScale.min,
       viewState: {}
@@ -162,14 +162,19 @@ class H3HexagonView extends Component {
         }
       }),
       new MVTLayer({
-        data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_TOKEN}`,
+        // data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_TOKEN}`,
         // data: `http://localhost:5000/satellite-lowres/{z}/{x}/{y}.pbf`,
         // data: `http://localhost:5000/canary/{z}/{x}/{y}.pbf`,
         // data: `http://tile.stamen.com/toner/{z}/{x}/{y}.png`,
         // data: `http://localhost:5000/world_countries/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:5000/states_provinces/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:7000/ne_10m_admin_1_states_provinces.mbtiles/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:5000/states_provinces_unzipped/{z}/{x}/{y}.pbf`,
+        data: `https://ipfs.io/ipfs/bafybeigyfjxrsxrlt2emeyvm3gihb7wvkbcqiel7xfa37yf4o4me6phua4/states_provinces/{z}/{x}/{y}.pbf`,
 
         minZoom: 0,
-        maxZoom: 23,
+        // maxZoom: 23,
+        maxZoom: 5,
         getLineColor: [192, 192, 192],
         getFillColor: [140, 170, 180],
 
@@ -195,7 +200,6 @@ class H3HexagonView extends Component {
       }
     })
     if (nextViewState != this.state.viewState) {
-      console.log('Jim _updateViewState', nextViewState)
       this.setState({ viewState: nextViewState })
       this.props.setViewState(nextViewState)
     }
@@ -358,7 +362,6 @@ export default function H3HexagonMVT () {
   )
 
   function flatten (event) {
-    console.log('Jim flatten', viewState)
     const initialViewState = {
       ...viewState,
       pitch: 0,
@@ -366,7 +369,6 @@ export default function H3HexagonMVT () {
       transitionInterpolator: new FlyToInterpolator(),
       transitionDuration: 1000
     }
-    console.log('Jim flatten2', initialViewState)
     setInitialViewState(initialViewState)
     event.preventDefault()
   }
