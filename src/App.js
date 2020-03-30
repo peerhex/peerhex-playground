@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import LineLayerExample from './line-layer/LineLayerExample'
 import ThreeDHeatmap from './3d-heatmap/ThreeDHeatmap'
 import H3Hexagon from './h3-hexagon/H3Hexagon'
+import MVTExample from './mvt/H3HexagonMVT'
+import TileExample from './tile/H3HexagonTile'
 
 function Home () {
   return <h2>Home</h2>
@@ -35,6 +37,12 @@ export default function App () {
             <StyledItem>
               <Link to='/h3-hexagon'>H3 Hexagon</Link>
             </StyledItem>
+            <StyledItem>
+              <Link to='/mvt'>MVT</Link>
+            </StyledItem>
+            <StyledItem>
+              <Link to='/tile'>Tile</Link>
+            </StyledItem>
           </StyledList>
         </nav>
         <Switch>
@@ -46,6 +54,12 @@ export default function App () {
           </Route>
           <Route path='/h3-hexagon'>
             <H3Hexagon />
+          </Route>
+          <Route path='/mvt'>
+            <MVTExample />
+          </Route>
+          <Route path='/tile'>
+            <TileExample />
           </Route>
           <Route path='/'>
             <Home />
