@@ -73,6 +73,194 @@ const colors = schemeCategory10.map(colorName => {
 
 const elevationScale = { min: 1, max: 50 }
 
+const initialData = [
+  {
+    hex: '87283095affffff',
+    count: 5.255980665670933,
+    colorIndex: 0
+  },
+  {
+    hex: '87283082dffffff',
+    count: 5.255980665670933,
+    colorIndex: 1
+  },
+  {
+    hex: '87283095effffff',
+    count: 5.255980665670933,
+    colorIndex: 2
+  },
+  {
+    hex: '862830817ffffff',
+    count: 6.54491734814939,
+    colorIndex: 3
+  },
+  {
+    hex: '8628308afffffff',
+    count: 6.54491734814939,
+    colorIndex: 4
+  },
+  {
+    hex: '8628308a7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 5
+  },
+  {
+    hex: '8428de5ffffffff',
+    count: 10.405531327562361,
+    colorIndex: 6
+  },
+  {
+    hex: '8428dedffffffff',
+    count: 10.405531327562361,
+    colorIndex: 7
+  },
+  {
+    hex: '8428d33ffffffff',
+    count: 10.405531327562361,
+    colorIndex: 8
+  },
+  {
+    hex: '8328d0fffffffff',
+    count: 13.566746727980593,
+    colorIndex: 9
+  },
+  {
+    hex: '8328d4fffffffff',
+    count: 13.566746727980593,
+    colorIndex: 0
+  },
+  {
+    hex: '8328d6fffffffff',
+    count: 13.566746727980593,
+    colorIndex: 1
+  },
+  {
+    hex: '86194ad27ffffff',
+    count: 6.54491734814939,
+    colorIndex: 2
+  },
+  {
+    hex: '86194ad37ffffff',
+    count: 6.54491734814939,
+    colorIndex: 3
+  },
+  {
+    hex: '86194ad07ffffff',
+    count: 6.54491734814939,
+    colorIndex: 4
+  },
+  {
+    hex: '87195da59ffffff',
+    count: 5.255980665670933,
+    colorIndex: 5
+  },
+  {
+    hex: '87195da4affffff',
+    count: 5.255980665670933,
+    colorIndex: 6
+  },
+  {
+    hex: '87194ada4ffffff',
+    count: 5.255980665670933,
+    colorIndex: 7
+  },
+  {
+    hex: '87195da4bffffff',
+    count: 5.255980665670933,
+    colorIndex: 8
+  },
+  {
+    hex: '87194ada5ffffff',
+    count: 5.255980665670933,
+    colorIndex: 9
+  },
+  {
+    hex: '862f5aac7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 0
+  },
+  {
+    hex: '862f5aacfffffff',
+    count: 6.54491734814939,
+    colorIndex: 1
+  },
+  {
+    hex: '862f5aadfffffff',
+    count: 6.54491734814939,
+    colorIndex: 2
+  },
+  {
+    hex: '862f5aad7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 3
+  },
+  {
+    hex: '862f5aa8fffffff',
+    count: 6.54491734814939,
+    colorIndex: 4
+  },
+  {
+    hex: '862f5a327ffffff',
+    count: 6.54491734814939,
+    colorIndex: 5
+  },
+  {
+    hex: '862a100dfffffff',
+    count: 6.54491734814939,
+    colorIndex: 6
+  },
+  {
+    hex: '862a100c7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 7
+  },
+  {
+    hex: '862a100cfffffff',
+    count: 6.54491734814939,
+    colorIndex: 8
+  },
+  {
+    hex: '862a100efffffff',
+    count: 6.54491734814939,
+    colorIndex: 9
+  },
+  {
+    hex: '86608b0a7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 0
+  },
+  {
+    hex: '86608b19fffffff',
+    count: 6.54491734814939,
+    colorIndex: 1
+  },
+  {
+    hex: '86608b0b7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 2
+  },
+  {
+    hex: '86344cd97ffffff',
+    count: 6.54491734814939,
+    colorIndex: 3
+  },
+  {
+    hex: '86344cdb7ffffff',
+    count: 6.54491734814939,
+    colorIndex: 4
+  },
+  {
+    hex: '86344cd1fffffff',
+    count: 6.54491734814939,
+    colorIndex: 5
+  },
+  {
+    hex: '86344124fffffff',
+    count: 6.54491734814939,
+    colorIndex: 6
+  }
+]
+
 const locations = {
   sfo: {
     latitude: 37.79443733047938,
@@ -253,7 +441,7 @@ export default function H3HexagonMVT () {
       setData(data)
     })
     */
-    setData([])
+    setData(initialData)
   }, [])
 
   useEffect(() => {
