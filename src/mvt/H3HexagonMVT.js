@@ -74,194 +74,6 @@ const colors = schemeCategory10.map(colorName => {
 
 const elevationScale = { min: 1, max: 50 }
 
-const initialData = [
-  {
-    hex: '87283095affffff',
-    count: 5.255980665670933,
-    colorIndex: 0
-  },
-  {
-    hex: '87283082dffffff',
-    count: 5.255980665670933,
-    colorIndex: 1
-  },
-  {
-    hex: '87283095effffff',
-    count: 5.255980665670933,
-    colorIndex: 2
-  },
-  {
-    hex: '862830817ffffff',
-    count: 6.54491734814939,
-    colorIndex: 3
-  },
-  {
-    hex: '8628308afffffff',
-    count: 6.54491734814939,
-    colorIndex: 4
-  },
-  {
-    hex: '8628308a7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 5
-  },
-  {
-    hex: '8428de5ffffffff',
-    count: 10.405531327562361,
-    colorIndex: 6
-  },
-  {
-    hex: '8428dedffffffff',
-    count: 10.405531327562361,
-    colorIndex: 7
-  },
-  {
-    hex: '8428d33ffffffff',
-    count: 10.405531327562361,
-    colorIndex: 8
-  },
-  {
-    hex: '8328d0fffffffff',
-    count: 13.566746727980593,
-    colorIndex: 9
-  },
-  {
-    hex: '8328d4fffffffff',
-    count: 13.566746727980593,
-    colorIndex: 0
-  },
-  {
-    hex: '8328d6fffffffff',
-    count: 13.566746727980593,
-    colorIndex: 1
-  },
-  {
-    hex: '86194ad27ffffff',
-    count: 6.54491734814939,
-    colorIndex: 2
-  },
-  {
-    hex: '86194ad37ffffff',
-    count: 6.54491734814939,
-    colorIndex: 3
-  },
-  {
-    hex: '86194ad07ffffff',
-    count: 6.54491734814939,
-    colorIndex: 4
-  },
-  {
-    hex: '87195da59ffffff',
-    count: 5.255980665670933,
-    colorIndex: 5
-  },
-  {
-    hex: '87195da4affffff',
-    count: 5.255980665670933,
-    colorIndex: 6
-  },
-  {
-    hex: '87194ada4ffffff',
-    count: 5.255980665670933,
-    colorIndex: 7
-  },
-  {
-    hex: '87195da4bffffff',
-    count: 5.255980665670933,
-    colorIndex: 8
-  },
-  {
-    hex: '87194ada5ffffff',
-    count: 5.255980665670933,
-    colorIndex: 9
-  },
-  {
-    hex: '862f5aac7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 0
-  },
-  {
-    hex: '862f5aacfffffff',
-    count: 6.54491734814939,
-    colorIndex: 1
-  },
-  {
-    hex: '862f5aadfffffff',
-    count: 6.54491734814939,
-    colorIndex: 2
-  },
-  {
-    hex: '862f5aad7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 3
-  },
-  {
-    hex: '862f5aa8fffffff',
-    count: 6.54491734814939,
-    colorIndex: 4
-  },
-  {
-    hex: '862f5a327ffffff',
-    count: 6.54491734814939,
-    colorIndex: 5
-  },
-  {
-    hex: '862a100dfffffff',
-    count: 6.54491734814939,
-    colorIndex: 6
-  },
-  {
-    hex: '862a100c7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 7
-  },
-  {
-    hex: '862a100cfffffff',
-    count: 6.54491734814939,
-    colorIndex: 8
-  },
-  {
-    hex: '862a100efffffff',
-    count: 6.54491734814939,
-    colorIndex: 9
-  },
-  {
-    hex: '86608b0a7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 0
-  },
-  {
-    hex: '86608b19fffffff',
-    count: 6.54491734814939,
-    colorIndex: 1
-  },
-  {
-    hex: '86608b0b7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 2
-  },
-  {
-    hex: '86344cd97ffffff',
-    count: 6.54491734814939,
-    colorIndex: 3
-  },
-  {
-    hex: '86344cdb7ffffff',
-    count: 6.54491734814939,
-    colorIndex: 4
-  },
-  {
-    hex: '86344cd1fffffff',
-    count: 6.54491734814939,
-    colorIndex: 5
-  },
-  {
-    hex: '86344124fffffff',
-    count: 6.54491734814939,
-    colorIndex: 6
-  }
-]
-
 const locations = {
   sfo: {
     latitude: 37.79443733047938,
@@ -330,28 +142,31 @@ class H3HexagonView extends Component {
   }
 
   _setTooltip (message, x, y) {
-    const el = this.tooltipRef.current;
+    const el = this.tooltipRef.current
     if (message) {
-      el.innerHTML = message;
-      el.style.display = 'block';
-      el.style.left = (x + 10) + 'px';
-      el.style.top = (y + 10) + 'px';
-      el.style.color = '#fff';
+      el.innerHTML = message
+      el.style.display = 'block'
+      el.style.left = x + 10 + 'px'
+      el.style.top = y + 10 + 'px'
+      el.style.color = '#fff'
     } else {
-      el.style.display = 'none';
+      el.style.display = 'none'
     }
   }
 
   _renderLayers () {
-    const { data } = this.props
-    const { viewState: { zoom } } = this.state
+    const { dataSolid, dataClear, removeHexSolid, removeHexClear } = this.props
+    const {
+      viewState: { zoom }
+    } = this.state
 
     return [
-      /*
       new H3HexagonLayer({
-        id: 'h3-hexagon-layer',
-        data,
+        id: 'h3-hexagon-layer-solid',
+        data: dataSolid,
         pickable: true,
+        autoHighlight: true,
+        highlightColor: [255, 255, 255, 100],
         wireframe: false,
         filled: true,
         extruded: true,
@@ -365,15 +180,14 @@ class H3HexagonView extends Component {
         },
         onClick: info => {
           if (info && info.object) {
-            this.props.removeHex(info.object.hex)
+            removeHexSolid(info.object.hex)
             return true
           }
         }
       }),
-      */
       new H3HexagonLayer({
-        id: 'h3-hexagon-layer',
-        data,
+        id: 'h3-hexagon-layer-clear',
+        data: dataClear,
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 100],
@@ -392,7 +206,7 @@ class H3HexagonView extends Component {
         },
         onClick: info => {
           if (info && info.object) {
-            this.props.removeHex(info.object.hex)
+            removeHexClear(info.object.hex)
             return true
           }
         }
@@ -439,9 +253,14 @@ class H3HexagonView extends Component {
 
     return (
       <>
-        <div ref={this.tooltipRef} style={{
-          position: "absolute", zIndex: 1, pointerEvents: "none"}
-        } />
+        <div
+          ref={this.tooltipRef}
+          style={{
+            position: 'absolute',
+            zIndex: 1,
+            pointerEvents: 'none'
+          }}
+        />
         <DeckGL
           layers={this._renderLayers()}
           effects={[lightingEffect]}
@@ -474,7 +293,8 @@ class H3HexagonView extends Component {
 
 export default function H3HexagonMVT () {
   const [resolution, setResolution] = useState(8)
-  const [data, setData] = useState([])
+  const [dataSolid, setDataSolid] = useState([])
+  const [dataClear, setDataClear] = useState([])
   const [nextColor, setNextColor] = useState(0)
   const location = useLocation()
   const [initialViewState, setInitialViewState] = useState({
@@ -483,20 +303,7 @@ export default function H3HexagonMVT () {
     minZoom: 1
   })
   const [viewState, setViewState] = useState({})
-
-  useEffect(() => {
-    /*
-    json(DATA_URL).then(data => {
-      let colorIndex = nextColor
-      for (let item of data) {
-        item.colorIndex = colorIndex++ % 10
-      }
-      setNextColor(colorIndex)
-      setData(data)
-    })
-    */
-    setData(initialData)
-  }, [])
+  const [solidOrClear, setSolidOrClear] = useState('solid')
 
   useEffect(() => {
     const key = location.hash.slice(1)
@@ -525,21 +332,37 @@ export default function H3HexagonMVT () {
       colorIndex
     }
     setNextColor(colorIndex + 1)
+    const data = solidOrClear === 'solid' ? dataSolid : dataClear
     const nextData = produce(data, draft => {
       draft.push(newDataPoint)
     })
-    setData(nextData)
+    if (solidOrClear === 'solid') {
+      setDataSolid(nextData)
+    } else {
+      setDataClear(nextData)
+    }
   }
 
-  function removeHex (hexToRemove) {
-    const nextData = produce(data, draft => {
+  function removeHexSolid (hexToRemove) {
+    const nextData = produce(dataSolid, draft => {
       draft.splice(
         0,
         draft.length,
         ...draft.filter(({ hex }) => hex !== hexToRemove)
       )
     })
-    setData(nextData)
+    setDataSolid(nextData)
+  }
+
+  function removeHexClear (hexToRemove) {
+    const nextData = produce(dataClear, draft => {
+      draft.splice(
+        0,
+        draft.length,
+        ...draft.filter(({ hex }) => hex !== hexToRemove)
+      )
+    })
+    setDataClear(nextData)
   }
 
   function handleChange (event) {
@@ -583,15 +406,41 @@ export default function H3HexagonMVT () {
           </StyledA>
         </div>
       </div>
-      <div style={{ position: 'relative', height: '80vh', background: '#64828c' }}>
+      <div
+        style={{ position: 'relative', height: '80vh', background: '#64828c' }}
+      >
         <H3HexagonView
-          data={data}
+          dataSolid={dataSolid}
+          dataClear={dataClear}
           initialViewState={initialViewState}
           pushLatLng={pushLatLng}
-          removeHex={removeHex}
+          removeHexSolid={removeHexSolid}
+          removeHexClear={removeHexClear}
           setViewState={setViewState}
         />
       </div>
+      <form>
+        <label>
+          <input
+            type='radio'
+            name='solidOrClear'
+            value='solid'
+            checked={solidOrClear === 'solid'}
+            onChange={() => setSolidOrClear('solid')}
+          />
+          Solid
+        </label>
+        <label>
+          <input
+            type='radio'
+            name='solidOrClear'
+            value='clear'
+            checked={solidOrClear === 'clear'}
+            onChange={() => setSolidOrClear('clear')}
+          />
+          Clear
+        </label>
+      </form>
     </div>
   )
 
