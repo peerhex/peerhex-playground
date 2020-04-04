@@ -67,7 +67,8 @@ const colorRange = [
 ]
 
 const colors = schemeCategory10.map(colorName => {
-  const { r, g, b } = d3Color(colorName)
+  // const { r, g, b } = d3Color(colorName).brighter()
+  const { r, g, b } = d3Color(colorName).brighter()
   return [r, g, b]
 })
 
@@ -339,6 +340,7 @@ class H3HexagonView extends Component {
         wireframe: false,
         filled: true,
         extruded: true,
+        material,
         elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
         getFillColor: d => colors[d.colorIndex],
@@ -367,7 +369,8 @@ class H3HexagonView extends Component {
         maxZoom: 5, // states_provinces
         // maxZoom: 9, // IPFS Demo
         getLineColor: [192, 192, 192],
-        getFillColor: [140, 170, 180],
+        // getFillColor: [100, 130, 140],
+        getFillColor: [40, 40, 40],
         getLineWidth: 1,
         lineWidthMinPixels: 1
       })
@@ -530,7 +533,7 @@ export default function H3HexagonMVT () {
           </StyledA>
         </div>
       </div>
-      <div style={{ position: 'relative', height: '80vh' }}>
+      <div style={{ position: 'relative', height: '80vh', background: '#64828c' }}>
         <H3HexagonView
           data={data}
           initialViewState={initialViewState}
