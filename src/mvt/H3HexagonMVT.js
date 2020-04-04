@@ -322,9 +322,23 @@ class H3HexagonView extends Component {
   constructor (props) {
     super(props)
     this.updateViewState = throttle(this._updateViewState.bind(this), 1000)
+    this.tooltipRef = React.createRef()
     this.state = {
       elevationScale: elevationScale.min,
       viewState: {}
+    }
+  }
+
+  _setTooltip (message, x, y) {
+    const el = this.tooltipRef.current;
+    if (message) {
+      el.innerHTML = message;
+      el.style.display = 'block';
+      el.style.left = (x + 10) + 'px';
+      el.style.top = (y + 10) + 'px';
+      el.style.color = '#fff';
+    } else {
+      el.style.display = 'none';
     }
   }
 
@@ -345,6 +359,9 @@ class H3HexagonView extends Component {
         getHexagon: d => d.hex,
         getFillColor: d => colors[d.colorIndex],
         getElevation: d => d.count,
+        onHover: info => {
+          this._setTooltip(info.object && info.object.hex, info.x, info.y)
+        },
         onClick: info => {
           if (info && info.object) {
             this.props.removeHex(info.object.hex)
@@ -393,16 +410,21 @@ class H3HexagonView extends Component {
     const { mapStyle = 'mapbox://styles/mapbox/dark-v9' } = this.props
 
     return (
-      <DeckGL
-        layers={this._renderLayers()}
-        effects={[lightingEffect]}
-        initialViewState={this.props.initialViewState}
-        controller={true}
-        onClick={this.onClick.bind(this)}
-        views={new MapView({ repeat: true })}
-      >
-        {({ viewState }) => this.updateViewState(viewState)}
-      </DeckGL>
+      <>
+        <div ref={this.tooltipRef} style={{
+          position: "absolute", zIndex: 1, pointerEvents: "none"}
+        } />
+        <DeckGL
+          layers={this._renderLayers()}
+          effects={[lightingEffect]}
+          initialViewState={this.props.initialViewState}
+          controller={true}
+          onClick={this.onClick.bind(this)}
+          views={new MapView({ repeat: true })}
+        >
+          {({ viewState }) => this.updateViewState(viewState)}
+        </DeckGL>
+      </>
     )
   }
   /*
