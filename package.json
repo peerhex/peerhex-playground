@@ -1,7 +1,10 @@
 {
-  "name": "webrtc-thingy-viz-react",
-  "version": "0.1.0",
+  "name": "peerhex-playground",
+  "version": "0.0.1",
+  "description": "Experimenting with many little libraries",
   "private": true,
+  "author": "Jim Pick (@jimpick)",
+  "license": "(Apache-2.0 AND MIT)",
   "dependencies": {
     "@deck.gl/aggregation-layers": "^8.1.1",
     "@deck.gl/core": "^8.1.1",

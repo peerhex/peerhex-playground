@@ -329,6 +329,7 @@ class H3HexagonView extends Component {
 
   _renderLayers () {
     const { data } = this.props
+    const { viewState: { zoom } } = this.state
 
     return [
       new H3HexagonLayer({
@@ -338,7 +339,7 @@ class H3HexagonView extends Component {
         wireframe: false,
         filled: true,
         extruded: true,
-        elevationScale: 20,
+        elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
         getFillColor: d => colors[d.colorIndex],
         getElevation: d => d.count,
