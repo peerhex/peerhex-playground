@@ -29,19 +29,7 @@ export default function App () {
               <Link to='/'>Home</Link>
             </StyledItem>
             <StyledItem>
-              <Link to='/line-layer'>Line Layer</Link>
-            </StyledItem>
-            <StyledItem>
-              <Link to='/3d-heatmap'>3D Heatmap</Link>
-            </StyledItem>
-            <StyledItem>
-              <Link to='/h3-hexagon'>H3 Hexagon</Link>
-            </StyledItem>
-            <StyledItem>
               <Link to='/mvt'>MVT</Link>
-            </StyledItem>
-            <StyledItem>
-              <Link to='/tile'>Tile</Link>
             </StyledItem>
           </StyledList>
         </nav>

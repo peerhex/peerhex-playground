@@ -347,6 +347,7 @@ class H3HexagonView extends Component {
     const { viewState: { zoom } } = this.state
 
     return [
+      /*
       new H3HexagonLayer({
         id: 'h3-hexagon-layer',
         data,
@@ -358,6 +359,33 @@ class H3HexagonView extends Component {
         elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
         getFillColor: d => colors[d.colorIndex],
+        getElevation: d => d.count,
+        onHover: info => {
+          this._setTooltip(info.object && info.object.hex, info.x, info.y)
+        },
+        onClick: info => {
+          if (info && info.object) {
+            this.props.removeHex(info.object.hex)
+            return true
+          }
+        }
+      }),
+      */
+      new H3HexagonLayer({
+        id: 'h3-hexagon-layer',
+        data,
+        pickable: true,
+        autoHighlight: true,
+        highlightColor: [255, 255, 255, 100],
+        wireframe: true,
+        filled: true,
+        extruded: true,
+        opacity: 0.2,
+        material,
+        elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
+        getHexagon: d => d.hex,
+        getFillColor: d => colors[d.colorIndex],
+        getLineColor: d => colors[d.colorIndex],
         getElevation: d => d.count,
         onHover: info => {
           this._setTooltip(info.object && info.object.hex, info.x, info.y)
