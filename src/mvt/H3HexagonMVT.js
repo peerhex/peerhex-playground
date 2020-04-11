@@ -121,7 +121,27 @@ export default function H3HexagonMVT () {
         </div>
         <div>
           <h3>Selected</h3>
-          {selectedHex && <div>Hex: {selectedHex[1]} {selectedHex[0]}</div>}
+          {selectedHex && (
+            <>
+              <div>
+                Hex: {selectedHex[1]} {selectedHex[0]}
+              </div>
+              <div>
+                <button
+                  onClick={() => {
+                    if (selectedHex[0] === 'solid') {
+                      removeHexSolid(selectedHex[1])
+                    } else {
+                      removeHexClear(selectedHex[1])
+                    }
+                    setSelectedHex(null)
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <form>
