@@ -21,6 +21,7 @@ export default function H3HexagonMVT () {
   })
   const [viewState, setViewState] = useState({})
   const [solidOrClear, setSolidOrClear] = useState('solid')
+  const [selectedHex, setSelectedHex] = useState()
 
   useEffect(() => {
     const key = location.hash.slice(1)
@@ -60,6 +61,14 @@ export default function H3HexagonMVT () {
     }
   }
 
+  function pickHexSolid (hex) {
+    setSelectedHex(['solid', hex])
+  }
+
+  function pickHexClear (hex) {
+    setSelectedHex(['clear', hex])
+  }
+
   function removeHexSolid (hexToRemove) {
     const nextData = produce(dataSolid, draft => {
       draft.splice(
@@ -91,18 +100,29 @@ export default function H3HexagonMVT () {
         />
         <LocationPicker flatten={flatten} />
       </div>
-      <div
-        style={{ position: 'relative', height: '80vh', background: '#64828c' }}
-      >
-        <H3HexagonView
-          dataSolid={dataSolid}
-          dataClear={dataClear}
-          initialViewState={initialViewState}
-          pushLatLng={pushLatLng}
-          removeHexSolid={removeHexSolid}
-          removeHexClear={removeHexClear}
-          setViewState={setViewState}
-        />
+      <div style={{ display: 'flex' }}>
+        <div
+          style={{
+            position: 'relative',
+            width: '70vw',
+            height: '80vh',
+            background: '#64828c'
+          }}
+        >
+          <H3HexagonView
+            dataSolid={dataSolid}
+            dataClear={dataClear}
+            initialViewState={initialViewState}
+            pushLatLng={pushLatLng}
+            removeHexSolid={pickHexSolid}
+            removeHexClear={pickHexClear}
+            setViewState={setViewState}
+          />
+        </div>
+        <div>
+          <h3>Selected</h3>
+          {selectedHex && <div>Hex: {selectedHex[1]} {selectedHex[0]}</div>}
+        </div>
       </div>
       <form>
         <label>
