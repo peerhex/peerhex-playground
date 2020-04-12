@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { FlyToInterpolator } from 'react-map-gl'
 import { geoToH3 } from 'h3-js'
 import produce from 'immer'
@@ -7,6 +7,13 @@ import locations from './locations'
 import H3HexagonView from './h3-hexagon-view'
 import ResolutionSelect from './resolution-select'
 import LocationPicker from './location-picker'
+import getPeerIdFromH3HexAndSecret from './deterministic-peer-id'
+
+// var array = new Uint8Array(64); crypto.getRandomValues(array)
+// Array.from(array).map(b => b.toString(16).padStart(2, "0")).join('')
+const secretHex =
+  '105471fbca3674e6b45709a56381891e133618ada169e52496907d461be55760' +
+  '02998949f060111889810320f8ff4f57b58734c187896ecf4daa44baeba9553f'
 
 export default function H3HexagonMVT () {
   const [resolution, setResolution] = useState(8)
@@ -22,6 +29,16 @@ export default function H3HexagonMVT () {
   const [viewState, setViewState] = useState({})
   const [solidOrClear, setSolidOrClear] = useState('solid')
   const [selectedHex, setSelectedHex] = useState()
+  const [peerId, setPeerId] = useState()
+  useEffect(() => {
+    if (selectedHex) {
+      async function run () {
+        const peerId = await getPeerIdFromH3HexAndSecret(selectedHex[1], secretHex)
+        setPeerId(peerId)
+      }
+      run()
+    }
+  }, [selectedHex])
 
   useEffect(() => {
     const key = location.hash.slice(1)
@@ -125,6 +142,9 @@ export default function H3HexagonMVT () {
             <>
               <div>
                 Hex: {selectedHex[1]} {selectedHex[0]}
+              </div>
+              <div>
+                PeerID: {peerId && peerId.toB58String()}
               </div>
               <div>
                 <button
