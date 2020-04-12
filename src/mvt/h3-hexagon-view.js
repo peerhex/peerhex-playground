@@ -3,7 +3,7 @@ import {
   AmbientLight,
   PointLight,
   LightingEffect,
-  MapView,
+  MapView
 } from '@deck.gl/core'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import { color as d3Color } from 'd3-color'
@@ -58,7 +58,6 @@ const colors = schemeCategory10.map(colorName => {
 
 const elevationScale = { min: 1, max: 50 }
 
-
 export default class H3HexagonView extends Component {
   static get defaultColorRange () {
     return colorRange
@@ -88,7 +87,13 @@ export default class H3HexagonView extends Component {
   }
 
   _renderLayers () {
-    const { dataSolid, dataClear, removeHexSolid, removeHexClear } = this.props
+    const {
+      dataSolid,
+      dataClear,
+      removeHexSolid,
+      removeHexClear,
+      selectedHex
+    } = this.props
     const {
       viewState: { zoom }
     } = this.state
@@ -106,8 +111,32 @@ export default class H3HexagonView extends Component {
         material,
         elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
-        getFillColor: d => colors[d.colorIndex],
-        getElevation: d => d.count,
+        getFillColor: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'solid' &&
+            d.hex === selectedHex[1]
+          ) {
+            return [255, 255, 255]
+          } else {
+            return colors[d.colorIndex]
+          }
+        },
+        getElevation: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'solid' &&
+            d.hex === selectedHex[1]
+          ) {
+            return d.count * 1.5
+          } else {
+            return d.count
+          }
+        },
+        updateTriggers: {
+          getFillColor: [selectedHex],
+          getElevation: [selectedHex]
+        },
         onHover: info => {
           this._setTooltip(info.object && info.object.hex, info.x, info.y)
         },
@@ -124,16 +153,39 @@ export default class H3HexagonView extends Component {
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 100],
-        wireframe: true,
+        wireframe: false,
         filled: true,
         extruded: true,
         opacity: 0.2,
         material,
         elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
-        getFillColor: d => colors[d.colorIndex],
-        getLineColor: d => colors[d.colorIndex],
-        getElevation: d => d.count,
+        getFillColor: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'clear' &&
+            d.hex === selectedHex[1]
+          ) {
+            return [255, 255, 255]
+          } else {
+            return colors[d.colorIndex]
+          }
+        },
+        getElevation: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'clear' &&
+            d.hex === selectedHex[1]
+          ) {
+            return d.count * 1.5
+          } else {
+            return d.count
+          }
+        },
+        updateTriggers: {
+          getFillColor: [selectedHex],
+          getElevation: [selectedHex]
+        },
         onHover: info => {
           this._setTooltip(info.object && info.object.hex, info.x, info.y)
         },
@@ -213,4 +265,3 @@ export default class H3HexagonView extends Component {
     this.props.pushLatLng(lat, lng)
   }
 }
-

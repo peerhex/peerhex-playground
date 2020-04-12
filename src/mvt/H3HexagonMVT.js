@@ -33,7 +33,10 @@ export default function H3HexagonMVT () {
   useEffect(() => {
     if (selectedHex) {
       async function run () {
-        const peerId = await getPeerIdFromH3HexAndSecret(selectedHex[1], secretHex)
+        const peerId = await getPeerIdFromH3HexAndSecret(
+          selectedHex[1],
+          secretHex
+        )
         setPeerId(peerId)
       }
       run()
@@ -121,7 +124,7 @@ export default function H3HexagonMVT () {
         <div
           style={{
             position: 'relative',
-            width: '70vw',
+            width: '55vw',
             height: '80vh',
             background: '#64828c'
           }}
@@ -134,6 +137,7 @@ export default function H3HexagonMVT () {
             removeHexSolid={pickHexSolid}
             removeHexClear={pickHexClear}
             setViewState={setViewState}
+            selectedHex={selectedHex}
           />
         </div>
         <div>
@@ -143,7 +147,7 @@ export default function H3HexagonMVT () {
               <div>
                 Hex: {selectedHex[1]} {selectedHex[0]}
               </div>
-              <div>
+              <div style={{ fontSize: 'small' }}>
                 PeerID: {peerId && peerId.toB58String()}
               </div>
               <div>
@@ -159,6 +163,7 @@ export default function H3HexagonMVT () {
                 >
                   Delete
                 </button>
+                <button onClick={() => setSelectedHex(null)}>Deselect</button>
               </div>
             </>
           )}
