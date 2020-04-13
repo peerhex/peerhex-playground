@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import {
   AmbientLight,
   PointLight,
@@ -58,6 +58,13 @@ const colors = schemeCategory10.map(colorName => {
 
 const elevationScale = { min: 1, max: 50 }
 
+function UpdateViewState ({ updateViewState, viewState }) {
+  useEffect(() => {
+    updateViewState(viewState)
+  }, [ updateViewState, viewState ])
+  return null
+}
+
 export default class H3HexagonView extends Component {
   static get defaultColorRange () {
     return colorRange
@@ -87,13 +94,7 @@ export default class H3HexagonView extends Component {
   }
 
   _renderLayers () {
-    const {
-      dataSolid,
-      dataClear,
-      dataDark,
-      pickHex,
-      selectedHex
-    } = this.props
+    const { dataSolid, dataClear, dataDark, pickHex, selectedHex } = this.props
     const {
       viewState: { zoom }
     } = this.state
@@ -321,7 +322,12 @@ export default class H3HexagonView extends Component {
           onClick={this.onClick.bind(this)}
           views={new MapView({ repeat: true })}
         >
-          {({ viewState }) => this.updateViewState(viewState)}
+          {({ viewState }) => (
+            <UpdateViewState
+              updateViewState={this.updateViewState}
+              viewState={viewState}
+            />
+          )}
         </DeckGL>
       </>
     )
