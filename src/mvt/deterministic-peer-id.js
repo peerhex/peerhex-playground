@@ -1,6 +1,5 @@
 import sodium from 'sodium-universal'
 import PeerId from 'peer-id'
-import multihash from 'multihashes'
 import libp2pCrypto from 'libp2p-crypto'
 
 // https://libsodium.gitbook.io/doc/key_derivation

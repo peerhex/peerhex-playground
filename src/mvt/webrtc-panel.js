@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useReducer } from 'react'
 import Libp2p from 'libp2p'
 import WebRTCStar from 'libp2p-webrtc-star'
 import Secio from 'libp2p-secio'
@@ -6,11 +6,52 @@ import Mplex from 'libp2p-mplex'
 import PeerInfo from 'peer-info'
 import produce from 'immer'
 
+function peersReducer (peers, action) {
+  const { type, peerInfo, updatePeerFunc } = action
+  switch (type) {
+    case 'add':
+      return addPeer(peerInfo)
+    case 'update':
+      return updatePeer(peerInfo, updatePeerFunc)
+    default:
+      throw new Error()
+  }
+
+  function addPeer (peerInfo) {
+    const nextPeers = produce(peers, draftPeers => {
+      const peerId = peerInfo.id.toB58String()
+      if (!draftPeers[peerId]) {
+        draftPeers[peerId] = {
+          peerInfo: peerInfo,
+          connected: false
+        }
+      }
+    })
+    return nextPeers
+  }
+
+  function updatePeer (peerInfo, updatePeerFunc) {
+    let nextPeers = addPeer(peerInfo)
+    nextPeers = produce(nextPeers, draftPeers => {
+      const peerId = peerInfo.id.toB58String()
+      const peer = draftPeers[peerId]
+      updatePeerFunc(peer)
+    })
+    return nextPeers
+  }
+}
+
+function logReducer (logs, txt) {
+  const nextLogs = produce(logs, draftLogs => {
+    draftLogs.push(txt)
+  })
+  return nextLogs
+}
+
 export default function WebRTCPanel ({ peerId }) {
   const [listening, setListening] = useState(false)
-  const [logs] = useState([])
-  const [_, forceUpdate] = useState(0)
-  const [peers, setPeers] = useState({})
+  const [logs, log] = useReducer(logReducer, [])
+  const [peers, dispatchPeersAction] = useReducer(peersReducer, {})
   const [libp2p, setLibp2p] = useState(null)
 
   useEffect(() => {
@@ -36,19 +77,31 @@ export default function WebRTCPanel ({ peerId }) {
 
       libp2p.on('peer:discovery', peerInfo => {
         log(`Found peer ${peerInfo.id.toB58String()}`)
-        setPeers(addPeer(peerInfo))
+        dispatchPeersAction({ type: 'add', peerInfo })
       })
 
       // Listen for new connections to peers
       libp2p.on('peer:connect', peerInfo => {
         log(`Connected to ${peerInfo.id.toB58String()}`)
-        setPeers(updatePeer(peerInfo, peer => { peer.connected = true }))
+        dispatchPeersAction({
+          type: 'update',
+          peerInfo,
+          updatePeerFunc: peer => {
+            peer.connected = true
+          }
+        })
       })
 
       // Listen for peers disconnecting
       libp2p.on('peer:disconnect', peerInfo => {
         log(`Disconnected from ${peerInfo.id.toB58String()}`)
-        setPeers(updatePeer(peerInfo, peer => { peer.connected = false }))
+        dispatchPeersAction({
+          type: 'update',
+          peerInfo,
+          updatePeerFunc: peer => {
+            peer.connected = false
+          }
+        })
       })
 
       await libp2p.start()
@@ -56,34 +109,6 @@ export default function WebRTCPanel ({ peerId }) {
     }
     run()
   }, [listening, peerId])
-
-  function log (txt) {
-    logs.push(txt)
-    forceUpdate(Date.now())
-  }
-
-  function addPeer (peerInfo) {
-    const nextPeers = produce(peers, draftPeers => {
-      const peerId = peerInfo.id.toB58String()
-      if (!draftPeers[peerId]) {
-        draftPeers[peerId] = {
-          peerInfo: peerInfo,
-          connected: false
-        }
-      }
-    })
-    return nextPeers
-  }
-
-  function updatePeer (peerInfo, updatePeerFunc) {
-    let nextPeers = addPeer(peerInfo)
-    nextPeers = produce(nextPeers, draftPeers => {
-      const peerId = peerInfo.id.toB58String()
-      const peer = draftPeers[peerId]
-      updatePeerFunc(peer)
-    })
-    return nextPeers
-  }
 
   if (!listening) {
     return (
@@ -103,25 +128,23 @@ export default function WebRTCPanel ({ peerId }) {
           return (
             <li key={peerId}>
               {peerId.slice(-3)} {peer.connected ? 'Connected' : 'Disconnected'}
-              {!peer.connected &&
-                  <button onClick={connect}>Connect</button>
-                }
+              {!peer.connected && <button onClick={connect}>Connect</button>}
             </li>
           )
           function connect () {
-            console.log('Jim connect', peerId, peer)
             async function dial () {
               log(`Dialing ${peerId}`)
-              const conn = await libp2p.dial(peer.peerInfo)
+              await libp2p.dial(peer.peerInfo)
               log(`Dialed ${peerId}`)
-              console.log('Jim dialed', peerId, conn)
             }
             dial()
           }
         })}
       </ul>
       <h3>Logs</h3>
-      {logs.map((line, i) => <div key={i}>{line}</div>)}
+      {logs.map((line, i) => (
+        <div key={i}>{line}</div>
+      ))}
     </div>
   )
 }

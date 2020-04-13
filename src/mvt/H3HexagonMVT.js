@@ -75,7 +75,7 @@ export default function H3HexagonMVT () {
       data = dataDark
       setDataNew = setDataDark
     } else {
-      throw 'nope'
+      throw new Error()
     }
     return [data, setDataNew]
   }

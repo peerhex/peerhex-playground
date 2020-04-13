@@ -241,17 +241,6 @@ export default class H3HexagonView extends Component {
             return d.count
           }
         },
-        getElevation: d => {
-          if (
-            selectedHex &&
-            selectedHex[0] === 'dark' &&
-            d.hex === selectedHex[1]
-          ) {
-            return d.count * 1.5
-          } else {
-            return d.count
-          }
-        },
         updateTriggers: {
           getFillColor: [selectedHex],
           getElevation: [selectedHex]
