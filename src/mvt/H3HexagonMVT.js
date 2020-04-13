@@ -19,7 +19,7 @@ export default function H3HexagonMVT () {
   const [resolution, setResolution] = useState(7)
   const [dataSolid, setDataSolid] = useState([])
   const [dataClear, setDataClear] = useState([])
-  const [dataWireframe1, setDataWireframe1] = useState([])
+  const [dataDark, setDataDark] = useState([])
   const [nextColor, setNextColor] = useState(0)
   const location = useLocation()
   const [initialViewState, setInitialViewState] = useState({
@@ -70,9 +70,9 @@ export default function H3HexagonMVT () {
     } else if (layer === 'clear') {
       data = dataClear
       setDataNew = setDataClear
-    } else if (layer === 'wireframe1') {
-      data = dataWireframe1
-      setDataNew = setDataWireframe1
+    } else if (layer === 'dark') {
+      data = dataDark
+      setDataNew = setDataDark
     } else {
       throw 'nope'
     }
@@ -134,7 +134,7 @@ export default function H3HexagonMVT () {
           <H3HexagonView
             dataSolid={dataSolid}
             dataClear={dataClear}
-            dataWireframe1={dataWireframe1}
+            dataDark={dataDark}
             initialViewState={initialViewState}
             pushLatLng={pushLatLng}
             pickHex={pickHex}
@@ -192,11 +192,11 @@ export default function H3HexagonMVT () {
           <input
             type='radio'
             name='dataLayer'
-            value='wireframe1'
-            checked={dataLayer === 'wireframe1'}
-            onChange={() => setDataLayer('wireframe1')}
+            value='dark'
+            checked={dataLayer === 'dark'}
+            onChange={() => setDataLayer('dark')}
           />
-          Wireframe 1
+          Dark
         </label>
       </form>
     </div>

@@ -90,7 +90,7 @@ export default class H3HexagonView extends Component {
     const {
       dataSolid,
       dataClear,
-      dataWireframe1,
+      dataDark,
       pickHex,
       selectedHex
     } = this.props
@@ -197,20 +197,31 @@ export default class H3HexagonView extends Component {
         }
       }),
       new H3HexagonLayer({
-        id: 'h3-hexagon-layer-wireframe-1',
-        data: dataWireframe1,
+        id: 'h3-hexagon-layer-dark',
+        data: dataDark,
         pickable: true,
         autoHighlight: true,
         highlightColor: [255, 255, 255, 100],
         wireframe: true,
-        filled: false,
+        filled: true,
         extruded: true,
         elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
+        getFillColor: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'dark' &&
+            d.hex === selectedHex[1]
+          ) {
+            return [100, 100, 100]
+          } else {
+            return [0, 0, 0]
+          }
+        },
         getLineColor: d => {
           if (
             selectedHex &&
-            selectedHex[0] === 'clear' &&
+            selectedHex[0] === 'dark' &&
             d.hex === selectedHex[1]
           ) {
             return [255, 255, 255]
@@ -221,7 +232,7 @@ export default class H3HexagonView extends Component {
         getElevation: d => {
           if (
             selectedHex &&
-            selectedHex[0] === 'clear' &&
+            selectedHex[0] === 'dark' &&
             d.hex === selectedHex[1]
           ) {
             return d.count * 1.5
@@ -232,7 +243,7 @@ export default class H3HexagonView extends Component {
         getElevation: d => {
           if (
             selectedHex &&
-            selectedHex[0] === 'wireframe1' &&
+            selectedHex[0] === 'dark' &&
             d.hex === selectedHex[1]
           ) {
             return d.count * 1.5
@@ -241,6 +252,7 @@ export default class H3HexagonView extends Component {
           }
         },
         updateTriggers: {
+          getFillColor: [selectedHex],
           getElevation: [selectedHex]
         },
         onHover: info => {
@@ -248,7 +260,7 @@ export default class H3HexagonView extends Component {
         },
         onClick: info => {
           if (info && info.object) {
-            pickHex('wireframe1', info.object.hex)
+            pickHex('dark', info.object.hex)
             return true
           }
         }
