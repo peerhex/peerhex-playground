@@ -16,9 +16,10 @@ const secretHex =
   '02998949f060111889810320f8ff4f57b58734c187896ecf4daa44baeba9553f'
 
 export default function H3HexagonMVT () {
-  const [resolution, setResolution] = useState(8)
+  const [resolution, setResolution] = useState(7)
   const [dataSolid, setDataSolid] = useState([])
   const [dataClear, setDataClear] = useState([])
+  const [dataWireframe1, setDataWireframe1] = useState([])
   const [nextColor, setNextColor] = useState(0)
   const location = useLocation()
   const [initialViewState, setInitialViewState] = useState({
@@ -27,10 +28,11 @@ export default function H3HexagonMVT () {
     minZoom: 1
   })
   const [viewState, setViewState] = useState({})
-  const [solidOrClear, setSolidOrClear] = useState('solid')
+  const [dataLayer, setDataLayer] = useState('solid')
   const [selectedHex, setSelectedHex] = useState()
   const [peerId, setPeerId] = useState()
   useEffect(() => {
+    setPeerId(null)
     if (selectedHex) {
       async function run () {
         const peerId = await getPeerIdFromH3HexAndSecret(
@@ -59,6 +61,24 @@ export default function H3HexagonMVT () {
     }
   }, [location])
 
+  function getDataAndSetter (layer) {
+    let data
+    let setDataNew
+    if (layer === 'solid') {
+      data = dataSolid
+      setDataNew = setDataSolid
+    } else if (layer === 'clear') {
+      data = dataClear
+      setDataNew = setDataClear
+    } else if (layer === 'wireframe1') {
+      data = dataWireframe1
+      setDataNew = setDataWireframe1
+    } else {
+      throw 'nope'
+    }
+    return [data, setDataNew]
+  }
+
   function pushLatLng (lat, lng) {
     const hex = geoToH3(lat, lng, resolution)
     const colorIndex = nextColor % 10
@@ -70,45 +90,27 @@ export default function H3HexagonMVT () {
       colorIndex
     }
     setNextColor(colorIndex + 1)
-    const data = solidOrClear === 'solid' ? dataSolid : dataClear
+    const [data, setDataNew] = getDataAndSetter(dataLayer)
     const nextData = produce(data, draft => {
       draft.push(newDataPoint)
     })
-    if (solidOrClear === 'solid') {
-      setDataSolid(nextData)
-    } else {
-      setDataClear(nextData)
-    }
+    setDataNew(nextData)
   }
 
-  function pickHexSolid (hex) {
-    setSelectedHex(['solid', hex])
+  function pickHex (layer, hex) {
+    setSelectedHex([layer, hex])
   }
 
-  function pickHexClear (hex) {
-    setSelectedHex(['clear', hex])
-  }
-
-  function removeHexSolid (hexToRemove) {
-    const nextData = produce(dataSolid, draft => {
+  function removeHex (layer, hexToRemove) {
+    const [data, setDataNew] = getDataAndSetter(layer)
+    const nextData = produce(data, draft => {
       draft.splice(
         0,
         draft.length,
         ...draft.filter(({ hex }) => hex !== hexToRemove)
       )
     })
-    setDataSolid(nextData)
-  }
-
-  function removeHexClear (hexToRemove) {
-    const nextData = produce(dataClear, draft => {
-      draft.splice(
-        0,
-        draft.length,
-        ...draft.filter(({ hex }) => hex !== hexToRemove)
-      )
-    })
-    setDataClear(nextData)
+    setDataNew(nextData)
   }
 
   return (
@@ -132,10 +134,10 @@ export default function H3HexagonMVT () {
           <H3HexagonView
             dataSolid={dataSolid}
             dataClear={dataClear}
+            dataWireframe1={dataWireframe1}
             initialViewState={initialViewState}
             pushLatLng={pushLatLng}
-            removeHexSolid={pickHexSolid}
-            removeHexClear={pickHexClear}
+            pickHex={pickHex}
             setViewState={setViewState}
             selectedHex={selectedHex}
           />
@@ -153,11 +155,7 @@ export default function H3HexagonMVT () {
               <div>
                 <button
                   onClick={() => {
-                    if (selectedHex[0] === 'solid') {
-                      removeHexSolid(selectedHex[1])
-                    } else {
-                      removeHexClear(selectedHex[1])
-                    }
+                    removeHex(selectedHex[0], selectedHex[1])
                     setSelectedHex(null)
                   }}
                 >
@@ -173,22 +171,32 @@ export default function H3HexagonMVT () {
         <label>
           <input
             type='radio'
-            name='solidOrClear'
+            name='dataLayer'
             value='solid'
-            checked={solidOrClear === 'solid'}
-            onChange={() => setSolidOrClear('solid')}
+            checked={dataLayer === 'solid'}
+            onChange={() => setDataLayer('solid')}
           />
           Solid
         </label>
         <label>
           <input
             type='radio'
-            name='solidOrClear'
+            name='dataLayer'
             value='clear'
-            checked={solidOrClear === 'clear'}
-            onChange={() => setSolidOrClear('clear')}
+            checked={dataLayer === 'clear'}
+            onChange={() => setDataLayer('clear')}
           />
           Clear
+        </label>
+        <label>
+          <input
+            type='radio'
+            name='dataLayer'
+            value='wireframe1'
+            checked={dataLayer === 'wireframe1'}
+            onChange={() => setDataLayer('wireframe1')}
+          />
+          Wireframe 1
         </label>
       </form>
     </div>

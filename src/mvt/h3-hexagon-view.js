@@ -90,8 +90,8 @@ export default class H3HexagonView extends Component {
     const {
       dataSolid,
       dataClear,
-      removeHexSolid,
-      removeHexClear,
+      dataWireframe1,
+      pickHex,
       selectedHex
     } = this.props
     const {
@@ -142,7 +142,7 @@ export default class H3HexagonView extends Component {
         },
         onClick: info => {
           if (info && info.object) {
-            removeHexSolid(info.object.hex)
+            pickHex('solid', info.object.hex)
             return true
           }
         }
@@ -191,7 +191,64 @@ export default class H3HexagonView extends Component {
         },
         onClick: info => {
           if (info && info.object) {
-            removeHexClear(info.object.hex)
+            pickHex('clear', info.object.hex)
+            return true
+          }
+        }
+      }),
+      new H3HexagonLayer({
+        id: 'h3-hexagon-layer-wireframe-1',
+        data: dataWireframe1,
+        pickable: true,
+        autoHighlight: true,
+        highlightColor: [255, 255, 255, 100],
+        wireframe: true,
+        filled: false,
+        extruded: true,
+        elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
+        getHexagon: d => d.hex,
+        getLineColor: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'clear' &&
+            d.hex === selectedHex[1]
+          ) {
+            return [255, 255, 255]
+          } else {
+            return [127, 127, 127]
+          }
+        },
+        getElevation: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'clear' &&
+            d.hex === selectedHex[1]
+          ) {
+            return d.count * 1.5
+          } else {
+            return d.count
+          }
+        },
+        getElevation: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'wireframe1' &&
+            d.hex === selectedHex[1]
+          ) {
+            return d.count * 1.5
+          } else {
+            return d.count
+          }
+        },
+        updateTriggers: {
+          getElevation: [selectedHex]
+        },
+        onHover: info => {
+          this._setTooltip(info.object && info.object.hex, info.x, info.y)
+        },
+        onClick: info => {
+          if (info && info.object) {
+            pickHex('wireframe1', info.object.hex)
             return true
           }
         }
@@ -227,7 +284,7 @@ export default class H3HexagonView extends Component {
         draft[key] = viewState[key]
       }
     })
-    if (nextViewState != this.state.viewState) {
+    if (nextViewState !== this.state.viewState) {
       this.setState({ viewState: nextViewState })
       this.props.setViewState(nextViewState)
     }
