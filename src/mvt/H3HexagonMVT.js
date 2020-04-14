@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useReducer } from 'react'
 import { FlyToInterpolator } from 'react-map-gl'
 import { geoToH3 } from 'h3-js'
 import produce from 'immer'
@@ -9,6 +9,7 @@ import ResolutionSelect from './resolution-select'
 import LocationPicker from './location-picker'
 import getPeerIdFromH3HexAndSecret from './deterministic-peer-id'
 import WebRTCPanel from './webrtc-panel'
+import listenersReducer from './listeners-reducer'
 
 // var array = new Uint8Array(64); crypto.getRandomValues(array)
 // Array.from(array).map(b => b.toString(16).padStart(2, "0")).join('')
@@ -61,6 +62,7 @@ export default function H3HexagonMVT () {
       setInitialViewState(initialViewState)
     }
   }, [location])
+  const [listeners, dispatchListenersAction] = useReducer(listenersReducer, {})
 
   function getDataAndSetter (layer) {
     let data
@@ -164,7 +166,13 @@ export default function H3HexagonMVT () {
                 </button>
                 <button onClick={() => setSelectedHex(null)}>Deselect</button>
               </div>
-              {peerId && <WebRTCPanel peerId={peerId} />}
+              {peerId && (
+                <WebRTCPanel
+                  peerId={peerId}
+                  listeners={listeners}
+                  dispatchListenersAction={dispatchListenersAction}
+                />
+              )}
             </>
           )}
         </div>
