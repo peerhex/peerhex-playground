@@ -1,11 +1,4 @@
-import React, { useEffect, useState, useReducer } from 'react'
-import Libp2p from 'libp2p'
-import WebRTCStar from 'libp2p-webrtc-star'
-import Secio from 'libp2p-secio'
-import Mplex from 'libp2p-mplex'
-import PeerInfo from 'peer-info'
-import peersReducer from './peers-reducer'
-import logsReducer from './logs-reducer'
+import React from 'react'
 import useListener from './useListener'
 
 export default function WebRTCPanel ({
@@ -13,17 +6,17 @@ export default function WebRTCPanel ({
   listeners,
   dispatchListenersAction
 }) {
-  const [listener, create, log] = useListener(peerId, listeners, dispatchListenersAction)
+  const [listener, create, log, dial] = useListener(
+    peerId,
+    listeners,
+    dispatchListenersAction
+  )
 
   if (!listener) {
     return (
       <div>
         Not listening
-        <button
-          onClick={create}
-        >
-          Listen
-        </button>
+        <button onClick={create}>Listen</button>
       </div>
     )
   }
@@ -33,21 +26,19 @@ export default function WebRTCPanel ({
     <div>
       <h3>Peers</h3>
       <ul>
-        {Object.keys(peers).map(peerId => {
-          const peer = peers[peerId]
+        {Object.keys(peers).map(remotePeerId => {
+          const peer = peers[remotePeerId]
           return (
-            <li key={peerId}>
-              {peerId.slice(-3)} {peer.connected ? 'Connected' : 'Disconnected'}
+            <li key={remotePeerId}>
+              {remotePeerId.slice(-3)}{' '}
+              {peer.connected ? 'Connected' : 'Disconnected'}
               {!peer.connected && <button onClick={connect}>Connect</button>}
             </li>
           )
           function connect () {
-            async function dial () {
-              log(`Dialing ${peerId}`)
-              // await libp2p.dial(peer.peerInfo)
-              log(`Dialed ${peerId}`)
-            }
-            dial()
+            log(`Dialing ${remotePeerId}`)
+            dial(remotePeerId)
+            log(`Dialed ${remotePeerId}`)
           }
         })}
       </ul>
