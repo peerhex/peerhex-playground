@@ -26,7 +26,7 @@ export default function H3HexagonMVT () {
   const [nextColor, setNextColor] = useState(0)
   const location = useLocation()
   const [initialViewState, setInitialViewState] = useState({
-    ...locations.sfo,
+    ...locations.yyj,
     maxZoom: 20,
     minZoom: 1
   })

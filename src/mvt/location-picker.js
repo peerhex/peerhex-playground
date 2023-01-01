@@ -8,6 +8,7 @@ const StyledA = styled.a`
 export default function ({ flatten }) {
   return (
     <div>
+      <StyledA href='#yyj'>YYJ</StyledA>
       <StyledA href='#sfo'>SFO</StyledA>
       <StyledA href='#yvr'>YVR</StyledA>
       <StyledA href='#lhr'>LHR</StyledA>
