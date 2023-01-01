@@ -12,6 +12,9 @@ import { H3HexagonLayer, MVTLayer } from '@deck.gl/geo-layers'
 import produce from 'immer'
 import DeckGL from '@deck.gl/react'
 
+// Set your mapbox token here
+const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
+
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
   intensity: 1.0
@@ -256,7 +259,7 @@ export default class H3HexagonView extends Component {
         }
       }),
       new MVTLayer({
-        // data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_TOKEN}`,
+        data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_TOKEN}`,
         // data: `http://localhost:5000/satellite-lowres/{z}/{x}/{y}.pbf`,
         // data: `http://localhost:5000/canary/{z}/{x}/{y}.pbf`,
         // data: `http://tile.stamen.com/toner/{z}/{x}/{y}.png`,
@@ -264,12 +267,12 @@ export default class H3HexagonView extends Component {
         // data: `http://localhost:5000/states_provinces/{z}/{x}/{y}.pbf`,
         // data: `http://localhost:7000/ne_10m_admin_1_states_provinces.mbtiles/{z}/{x}/{y}.pbf`,
         // data: `http://localhost:5000/states_provinces_unzipped/{z}/{x}/{y}.pbf`,
-        data: `https://ipfs.io/ipfs/bafybeigyfjxrsxrlt2emeyvm3gihb7wvkbcqiel7xfa37yf4o4me6phua4/states_provinces/{z}/{x}/{y}.pbf`,
+        // data: `https://ipfs.io/ipfs/bafybeigyfjxrsxrlt2emeyvm3gihb7wvkbcqiel7xfa37yf4o4me6phua4/states_provinces/{z}/{x}/{y}.pbf`,
         // data: `https://ipfs.io/ipfs/QmUefFZttPf9xq4KTkk94rBbZEVrBsTreDi4JA8KYhQFX6/{z}/{x}/{y}`, // IPFS Demo
 
         minZoom: 0,
-        // maxZoom: 23, // MapBox
-        maxZoom: 5, // states_provinces
+        maxZoom: 23, // MapBox
+        // maxZoom: 5, // states_provinces
         // maxZoom: 9, // IPFS Demo
         getLineColor: [192, 192, 192],
         // getFillColor: [100, 130, 140],

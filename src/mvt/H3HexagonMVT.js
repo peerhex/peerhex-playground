@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useReducer } from 'react'
+import React, { useState, useEffect, useReducer, useMemo } from 'react'
 import { FlyToInterpolator } from 'react-map-gl'
 import { geoToH3 } from 'h3-js'
 import produce from 'immer'
 import { useLocation } from 'react-router-dom'
+import base32 from 'base32.js'
 import locations from './locations'
 import H3HexagonView from './h3-hexagon-view'
 import ResolutionSelect from './resolution-select'
@@ -32,6 +33,20 @@ export default function H3HexagonMVT () {
   const [viewState, setViewState] = useState({})
   const [dataLayer, setDataLayer] = useState('solid')
   const [selectedHex, setSelectedHex] = useState()
+  const selectedHexBase32 = useMemo(
+    () => {
+      if (!selectedHex || !selectedHex[1]) return ''
+      let trimmed = selectedHex[1].replace(/f*$/, '')
+      if (trimmed[0] !== '8') return 'Error'
+      if (trimmed.length % 2 == 0) {
+        trimmed += 'f'
+      }
+      const buf = Buffer.from(trimmed.slice(1), 'hex')
+      const encoder = new base32.Encoder({ type: "rfc4648", lc: true })
+      const str = encoder.write(buf).finalize()
+      return str
+    }, [ selectedHex ]
+  )
   const [peerId, setPeerId] = useState()
   useEffect(() => {
     setPeerId(null)
@@ -151,6 +166,12 @@ export default function H3HexagonMVT () {
             <>
               <div>
                 Hex: {selectedHex[1]} {selectedHex[0]}
+              </div>
+              <div>
+                Base32: {selectedHexBase32}
+              </div>
+              <div>
+                Hex.Camp URL: <a href="https://{selectedHexBase32}.hex.camp}">{selectedHexBase32}.hex.camp</a>
               </div>
               <div style={{ fontSize: 'small' }}>
                 PeerID: {peerId && peerId.toB58String()}
