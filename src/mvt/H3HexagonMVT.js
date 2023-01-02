@@ -186,6 +186,17 @@ export default function H3HexagonMVT () {
               )}
             </>
           )}
+          <h3>Data</h3>
+          <details>
+            <pre>
+              {JSON.stringify({
+                viewState,
+                solid: dataSolid,
+                clear: dataClear,
+                dark: dataDark
+              }, null, 2)}
+            </pre>
+          </details>
         </div>
       </div>
       <form>
