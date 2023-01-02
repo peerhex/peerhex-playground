@@ -3,7 +3,7 @@ import { FlyToInterpolator } from 'react-map-gl'
 import { geoToH3 } from 'h3-js'
 import produce from 'immer'
 import { useLocation } from 'react-router-dom'
-import base32 from 'base32.js'
+import hexToUrl from './hex-to-url'
 import locations from './locations'
 import H3HexagonView from './h3-hexagon-view'
 import ResolutionSelect from './resolution-select'
@@ -34,18 +34,8 @@ export default function H3HexagonMVT () {
   const [dataLayer, setDataLayer] = useState('solid')
   const [selectedHex, setSelectedHex] = useState()
   const selectedHexBase32 = useMemo(
-    () => {
-      if (!selectedHex || !selectedHex[1]) return ''
-      let trimmed = selectedHex[1].replace(/f*$/, '')
-      if (trimmed[0] !== '8') return 'Error'
-      if (trimmed.length % 2 == 0) {
-        trimmed += 'f'
-      }
-      const buf = Buffer.from(trimmed.slice(1), 'hex')
-      const encoder = new base32.Encoder({ type: "rfc4648", lc: true })
-      const str = encoder.write(buf).finalize()
-      return str
-    }, [ selectedHex ]
+    () => selectedHex ? hexToUrl(selectedHex[1]) : '',
+    [ selectedHex ]
   )
   const [peerId, setPeerId] = useState()
   useEffect(() => {

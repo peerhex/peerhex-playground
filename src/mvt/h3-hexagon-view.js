@@ -11,6 +11,7 @@ import throttle from 'lodash.throttle'
 import { H3HexagonLayer, MVTLayer } from '@deck.gl/geo-layers'
 import produce from 'immer'
 import DeckGL from '@deck.gl/react'
+import hexToUrl from './hex-to-url'
 
 // Set your mapbox token here
 const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
@@ -142,7 +143,10 @@ export default class H3HexagonView extends Component {
           getElevation: [selectedHex]
         },
         onHover: info => {
-          this._setTooltip(info.object && info.object.hex, info.x, info.y)
+          this._setTooltip(
+            info.object && info.object.hex ? hexToUrl(info.object.hex) : '',
+            info.x,
+            info.y)
         },
         onClick: info => {
           if (info && info.object) {
@@ -191,7 +195,10 @@ export default class H3HexagonView extends Component {
           getElevation: [selectedHex]
         },
         onHover: info => {
-          this._setTooltip(info.object && info.object.hex, info.x, info.y)
+          this._setTooltip(
+            info.object && info.object.hex ? hexToUrl(info.object.hex) : '',
+            info.x,
+            info.y)
         },
         onClick: info => {
           if (info && info.object) {
@@ -249,7 +256,10 @@ export default class H3HexagonView extends Component {
           getElevation: [selectedHex]
         },
         onHover: info => {
-          this._setTooltip(info.object && info.object.hex, info.x, info.y)
+          this._setTooltip(
+            info.object && info.object.hex ? hexToUrl(info.object.hex) : '',
+            info.x,
+            info.y)
         },
         onClick: info => {
           if (info && info.object) {
