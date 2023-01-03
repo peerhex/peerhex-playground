@@ -12,9 +12,11 @@ import { H3HexagonLayer, MVTLayer } from '@deck.gl/geo-layers'
 import produce from 'immer'
 import DeckGL from '@deck.gl/react'
 import hexToUrl from './hex-to-url'
+import tokens from '../tokens.json'
 
 // Set your mapbox token here
-const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
+// const MAPBOX_TOKEN = localStorage.getItem('mapbox_token')
+const MAPBOX_TOKEN = tokens.mapbox
 
 const ambientLight = new AmbientLight({
   color: [255, 255, 255],
