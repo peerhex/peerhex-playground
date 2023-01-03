@@ -68,6 +68,18 @@ export default function H3HexagonMVT () {
     }
   }, [location])
   const [listeners, dispatchListenersAction] = useReducer(listenersReducer, {})
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch(process.env.PUBLIC_URL + '/data.json')
+      const data = await response.json()
+      console.log('Jim data', data)
+      setDataSolid(data.solid)
+      setDataClear(data.clear)
+      setDataDark(data.dark)
+      setViewState(data.viewState)
+    }
+    fetchData()
+  }, [setDataSolid, setDataClear, setDataDark, setViewState])
 
   function getDataAndSetter (layer) {
     let data
