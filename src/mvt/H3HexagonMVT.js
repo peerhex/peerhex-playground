@@ -173,7 +173,7 @@ export default function H3HexagonMVT () {
                 Base32: {selectedHexBase32}
               </div>
               <div>
-                Hex.Camp URL: <a href="https://{selectedHexBase32}.hex.camp}">{selectedHexBase32}.hex.camp</a>
+                Hex.Camp URL: <a href={`https://${selectedHexBase32}.hex.camp`}>{selectedHexBase32}.hex.camp</a>
               </div>
               <div style={{ fontSize: 'small' }}>
                 PeerID: {peerId && peerId.toB58String()}
