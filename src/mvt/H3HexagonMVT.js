@@ -53,7 +53,8 @@ export default function H3HexagonMVT () {
   }, [selectedHex])
 
   useEffect(() => {
-    const key = location.hash.slice(1)
+    console.log('Jim location', location)
+    const key = location.search.replace('?loc=', '')
     if (locations[key]) {
       const initialViewState = {
         ...locations[key],
@@ -135,18 +136,20 @@ export default function H3HexagonMVT () {
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
-        <ResolutionSelect
-          resolution={resolution}
-          setResolution={setResolution}
-        />
-        <LocationPicker flatten={flatten} />
-      </div>
+      {location.pathname === '/edit' &&
+        <div style={{ display: 'flex' }}>
+          <ResolutionSelect
+            resolution={resolution}
+            setResolution={setResolution}
+          />
+          <LocationPicker flatten={flatten} />
+        </div>
+      }
       <div style={{ display: 'flex' }}>
         <div
           style={{
             position: 'relative',
-            width: '55vw',
+            width: '100%',
             height: '80vh',
             background: '#64828c'
           }}
@@ -162,87 +165,99 @@ export default function H3HexagonMVT () {
             selectedHex={selectedHex}
           />
         </div>
-        <div>
-          <h3>Selected</h3>
-          {selectedHex && (
-            <>
-              <div>
-                Hex: {selectedHex[1]} {selectedHex[0]}
-              </div>
-              <div>
-                Base32: {selectedHexBase32}
-              </div>
-              <div>
-                Hex.Camp URL: <a href={`https://${selectedHexBase32}.hex.camp`}>{selectedHexBase32}.hex.camp</a>
-              </div>
-              <div style={{ fontSize: 'small' }}>
-                PeerID: {peerId && peerId.toB58String()}
-              </div>
-              <div>
-                <button
-                  onClick={() => {
-                    removeHex(selectedHex[0], selectedHex[1])
-                    setSelectedHex(null)
-                  }}
-                >
-                  Delete
-                </button>
-                <button onClick={() => setSelectedHex(null)}>Deselect</button>
-              </div>
-              {peerId && (
-                <WebRTCPanel
-                  peerId={peerId}
-                  listeners={listeners}
-                  dispatchListenersAction={dispatchListenersAction}
-                />
-              )}
-            </>
-          )}
-          <h3>Data</h3>
-          <details>
-            <pre>
-              {JSON.stringify({
-                viewState,
-                solid: dataSolid,
-                clear: dataClear,
-                dark: dataDark
-              }, null, 2)}
-            </pre>
-          </details>
-        </div>
+        {location.pathname === '/edit' &&
+          <div>
+            <h3>Selected</h3>
+            {selectedHex && (
+              <>
+                <div>
+                  Hex: {selectedHex[1]} {selectedHex[0]}
+                </div>
+                <div>
+                  Base32: {selectedHexBase32}
+                </div>
+                <div>
+                  Hex.Camp URL: <a href={`https://${selectedHexBase32}.hex.camp`}>{selectedHexBase32}.hex.camp</a>
+                </div>
+                <div style={{ fontSize: 'small' }}>
+                  PeerID: {peerId && peerId.toB58String()}
+                </div>
+                <div>
+                  <button
+                    onClick={() => {
+                      removeHex(selectedHex[0], selectedHex[1])
+                      setSelectedHex(null)
+                    }}
+                  >
+                    Delete
+                  </button>
+                  <button onClick={() => setSelectedHex(null)}>Deselect</button>
+                </div>
+                {peerId && (
+                  <WebRTCPanel
+                    peerId={peerId}
+                    listeners={listeners}
+                    dispatchListenersAction={dispatchListenersAction}
+                  />
+                )}
+              </>
+            )}
+            <h3>Data</h3>
+            <details>
+              <pre>
+                {JSON.stringify({
+                  viewState,
+                  solid: dataSolid,
+                  clear: dataClear,
+                  dark: dataDark
+                }, null, 2)}
+              </pre>
+            </details>
+          </div>
+        }
       </div>
-      <form>
-        <label>
-          <input
-            type='radio'
-            name='dataLayer'
-            value='solid'
-            checked={dataLayer === 'solid'}
-            onChange={() => setDataLayer('solid')}
-          />
-          Solid
-        </label>
-        <label>
-          <input
-            type='radio'
-            name='dataLayer'
-            value='clear'
-            checked={dataLayer === 'clear'}
-            onChange={() => setDataLayer('clear')}
-          />
-          Clear
-        </label>
-        <label>
-          <input
-            type='radio'
-            name='dataLayer'
-            value='dark'
-            checked={dataLayer === 'dark'}
-            onChange={() => setDataLayer('dark')}
-          />
-          Dark
-        </label>
-      </form>
+      {location.pathname === '/' &&
+        <div style={{padding: '0.5rem'}}>
+          { selectedHex ?
+            <a href={`https://${selectedHexBase32}.hex.camp`}>{selectedHexBase32}.hex.camp</a>
+            : <span>No hexagon selected.</span>
+          }
+        </div>
+      }
+      {location.pathname === '/edit' &&
+        <form>
+          <label>
+            <input
+              type='radio'
+              name='dataLayer'
+              value='solid'
+              checked={dataLayer === 'solid'}
+              onChange={() => setDataLayer('solid')}
+            />
+            Solid
+          </label>
+          <label>
+            <input
+              type='radio'
+              name='dataLayer'
+              value='clear'
+              checked={dataLayer === 'clear'}
+              onChange={() => setDataLayer('clear')}
+            />
+            Clear
+          </label>
+          <label>
+            <input
+              type='radio'
+              name='dataLayer'
+              value='dark'
+              checked={dataLayer === 'dark'}
+              onChange={() => setDataLayer('dark')}
+            />
+            Dark
+          </label>
+        </form>
+      }
     </div>
   )
 

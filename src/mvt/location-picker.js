@@ -6,17 +6,19 @@ const StyledA = styled.a`
 `
 
 export default function ({ flatten }) {
+  const base = document.location.href.replace(/\?.*/, '')
+  const genUrl = airportCode => base + '?loc=' + airportCode
   return (
     <div>
-      <StyledA href='#yyj'>YYJ</StyledA>
-      <StyledA href='#sfo'>SFO</StyledA>
-      <StyledA href='#yvr'>YVR</StyledA>
-      <StyledA href='#lhr'>LHR</StyledA>
-      <StyledA href='#hnd'>HND</StyledA>
-      <StyledA href='#jfk'>JFK</StyledA>
-      <StyledA href='#bom'>BOM</StyledA>
-      <StyledA href='#tfn'>TFN</StyledA>
-      <StyledA href='#' onClick={flatten}>
+      <StyledA href={genUrl('yyj')}>YYJ</StyledA>
+      <StyledA href={genUrl('sfo')}>SFO</StyledA>
+      <StyledA href={genUrl('yvr')}>YVR</StyledA>
+      <StyledA href={genUrl('lhr')}>LHR</StyledA>
+      <StyledA href={genUrl('hnd')}>HND</StyledA>
+      <StyledA href={genUrl('jfk')}>JFK</StyledA>
+      <StyledA href={genUrl('bom')}>BOM</StyledA>
+      <StyledA href={genUrl('tfn')}>TFN</StyledA>
+      <StyledA href={base} onClick={flatten}>
         Flat
       </StyledA>
     </div>

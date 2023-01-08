@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { HashRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import styled from 'styled-components'
 import LineLayerExample from './line-layer/LineLayerExample'
 import ThreeDHeatmap from './3d-heatmap/ThreeDHeatmap'
@@ -29,28 +29,16 @@ export default function App () {
               <Link to='/'>Home</Link>
             </StyledItem>
             <StyledItem>
-              <Link to='/mvt'>MVT</Link>
+              <Link to='/edit'>Edit</Link>
             </StyledItem>
           </StyledList>
         </nav>
         <Switch>
-          <Route path='/line-layer'>
-            <LineLayerExample />
-          </Route>
-          <Route path='/3d-heatmap'>
-            <ThreeDHeatmap />
-          </Route>
-          <Route path='/h3-hexagon'>
-            <H3Hexagon />
-          </Route>
           <Route path='/mvt'>
             <MVTExample />
           </Route>
-          <Route path='/tile'>
-            <TileExample />
-          </Route>
           <Route path='/'>
-            <Home />
+            <MVTExample />
           </Route>
         </Switch>
       </div>
