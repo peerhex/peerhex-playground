@@ -100,7 +100,7 @@ export default class H3HexagonView extends Component {
   }
 
   _renderLayers () {
-    const { dataSolid, dataClear, dataDark, pickHex, selectedHex } = this.props
+    const { dataSolid, pickHex, selectedHex } = this.props
     const {
       viewState: { zoom }
     } = this.state
@@ -126,7 +126,7 @@ export default class H3HexagonView extends Component {
         // getFillColor: [100, 130, 140],
         getFillColor: [40, 40, 40],
         getLineWidth: 1,
-        lineWidthMinPixels: 1
+        lineWidthMinPixels: 1,
       }),
       new H3HexagonLayer({
         id: 'h3-hexagon-layer-solid',
@@ -194,119 +194,6 @@ export default class H3HexagonView extends Component {
           }
         }
       }),
-      new H3HexagonLayer({
-        id: 'h3-hexagon-layer-clear',
-        data: dataClear,
-        pickable: true,
-        autoHighlight: true,
-        highlightColor: [255, 255, 255, 100],
-        wireframe: false,
-        filled: true,
-        extruded: true,
-        opacity: 0.2,
-        material,
-        elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
-        getHexagon: d => d.hex,
-        getFillColor: d => {
-          if (
-            selectedHex &&
-            selectedHex[0] === 'clear' &&
-            d.hex === selectedHex[1]
-          ) {
-            return [255, 255, 255]
-          } else {
-            return colors[d.colorIndex]
-          }
-        },
-        getElevation: d => {
-          if (
-            selectedHex &&
-            selectedHex[0] === 'clear' &&
-            d.hex === selectedHex[1]
-          ) {
-            return d.count * 1.5
-          } else {
-            return d.count
-          }
-        },
-        updateTriggers: {
-          getFillColor: [selectedHex],
-          getElevation: [selectedHex]
-        },
-        onHover: info => {
-          this._setTooltip(
-            info.object && info.object.hex ? hexToUrl(info.object.hex) : '',
-            info.x,
-            info.y)
-        },
-        onClick: info => {
-          if (info && info.object) {
-            pickHex('clear', info.object.hex)
-            return true
-          }
-        }
-      }),
-      new H3HexagonLayer({
-        id: 'h3-hexagon-layer-dark',
-        data: dataDark,
-        pickable: true,
-        autoHighlight: true,
-        highlightColor: [255, 255, 255, 100],
-        wireframe: true,
-        filled: true,
-        extruded: true,
-        elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
-        getHexagon: d => d.hex,
-        getFillColor: d => {
-          if (
-            selectedHex &&
-            selectedHex[0] === 'dark' &&
-            d.hex === selectedHex[1]
-          ) {
-            return [100, 100, 100]
-          } else {
-            return [0, 0, 0]
-          }
-        },
-        getLineColor: d => {
-          if (
-            selectedHex &&
-            selectedHex[0] === 'dark' &&
-            d.hex === selectedHex[1]
-          ) {
-            return [255, 255, 255]
-          } else {
-            return [127, 127, 127]
-          }
-        },
-        getElevation: d => {
-          if (
-            selectedHex &&
-            selectedHex[0] === 'dark' &&
-            d.hex === selectedHex[1]
-          ) {
-            return d.count * 1.5
-          } else {
-            return d.count
-          }
-        },
-        updateTriggers: {
-          getFillColor: [selectedHex],
-          getElevation: [selectedHex]
-        },
-        onHover: info => {
-          this._setTooltip(
-            info.object && info.object.hex ? hexToUrl(info.object.hex) : '',
-            info.x,
-            info.y)
-        },
-        onClick: info => {
-          if (info && info.object) {
-            pickHex('dark', info.object.hex)
-            return true
-          }
-        }
-      })
     ]
   }
 

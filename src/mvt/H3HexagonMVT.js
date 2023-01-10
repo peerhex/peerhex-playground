@@ -21,8 +21,6 @@ const secretHex =
 export default function H3HexagonMVT () {
   const [resolution, setResolution] = useState(7)
   const [dataSolid, setDataSolid] = useState([])
-  const [dataClear, setDataClear] = useState([])
-  const [dataDark, setDataDark] = useState([])
   const [nextColor, setNextColor] = useState(0)
   const location = useLocation()
   const [initialViewState, setInitialViewState] = useState({
@@ -75,12 +73,10 @@ export default function H3HexagonMVT () {
       const data = await response.json()
       console.log('Jim data', data)
       setDataSolid(data.solid)
-      setDataClear(data.clear)
-      setDataDark(data.dark)
       setViewState(data.viewState)
     }
     fetchData()
-  }, [setDataSolid, setDataClear, setDataDark, setViewState])
+  }, [setDataSolid, setViewState])
 
   function getDataAndSetter (layer) {
     let data
@@ -88,12 +84,6 @@ export default function H3HexagonMVT () {
     if (layer === 'solid') {
       data = dataSolid
       setDataNew = setDataSolid
-    } else if (layer === 'clear') {
-      data = dataClear
-      setDataNew = setDataClear
-    } else if (layer === 'dark') {
-      data = dataDark
-      setDataNew = setDataDark
     } else {
       throw new Error()
     }
@@ -157,8 +147,6 @@ export default function H3HexagonMVT () {
         >
           <H3HexagonView
             dataSolid={dataSolid}
-            dataClear={dataClear}
-            dataDark={dataDark}
             initialViewState={initialViewState}
             pushLatLng={pushLatLng}
             pickHex={pickHex}
@@ -208,9 +196,7 @@ export default function H3HexagonMVT () {
               <pre>
                 {JSON.stringify({
                   viewState,
-                  solid: dataSolid,
-                  clear: dataClear,
-                  dark: dataDark
+                  solid: dataSolid
                 }, null, 2)}
               </pre>
             </details>
@@ -224,40 +210,6 @@ export default function H3HexagonMVT () {
             : <span>No hexagon selected.</span>
           }
         </div>
-      }
-      {location.pathname === '/edit' &&
-        <form>
-          <label>
-            <input
-              type='radio'
-              name='dataLayer'
-              value='solid'
-              checked={dataLayer === 'solid'}
-              onChange={() => setDataLayer('solid')}
-            />
-            Solid
-          </label>
-          <label>
-            <input
-              type='radio'
-              name='dataLayer'
-              value='clear'
-              checked={dataLayer === 'clear'}
-              onChange={() => setDataLayer('clear')}
-            />
-            Clear
-          </label>
-          <label>
-            <input
-              type='radio'
-              name='dataLayer'
-              value='dark'
-              checked={dataLayer === 'dark'}
-              onChange={() => setDataLayer('dark')}
-            />
-            Dark
-          </label>
-        </form>
       }
     </div>
   )
