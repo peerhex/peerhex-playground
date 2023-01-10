@@ -166,7 +166,7 @@ export default function H3HexagonMVT () {
           />
         </div>
         {location.pathname === '/edit' &&
-          <div>
+          <div style={{ width: '100%' }}>
             <h3>Selected</h3>
             {selectedHex && (
               <>
