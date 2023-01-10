@@ -106,6 +106,28 @@ export default class H3HexagonView extends Component {
     } = this.state
 
     return [
+      new MVTLayer({
+        data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_TOKEN}`,
+        // data: `http://localhost:5000/satellite-lowres/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:5000/canary/{z}/{x}/{y}.pbf`,
+        // data: `http://tile.stamen.com/toner/{z}/{x}/{y}.png`,
+        // data: `http://localhost:5000/world_countries/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:5000/states_provinces/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:7000/ne_10m_admin_1_states_provinces.mbtiles/{z}/{x}/{y}.pbf`,
+        // data: `http://localhost:5000/states_provinces_unzipped/{z}/{x}/{y}.pbf`,
+        // data: `https://ipfs.io/ipfs/bafybeigyfjxrsxrlt2emeyvm3gihb7wvkbcqiel7xfa37yf4o4me6phua4/states_provinces/{z}/{x}/{y}.pbf`,
+        // data: `https://ipfs.io/ipfs/QmUefFZttPf9xq4KTkk94rBbZEVrBsTreDi4JA8KYhQFX6/{z}/{x}/{y}`, // IPFS Demo
+
+        minZoom: 0,
+        maxZoom: 23, // MapBox
+        // maxZoom: 5, // states_provinces
+        // maxZoom: 9, // IPFS Demo
+        getLineColor: [192, 192, 192],
+        // getFillColor: [100, 130, 140],
+        getFillColor: [40, 40, 40],
+        getLineWidth: 1,
+        lineWidthMinPixels: 1
+      }),
       new H3HexagonLayer({
         id: 'h3-hexagon-layer-solid',
         data: dataSolid,
@@ -114,11 +136,25 @@ export default class H3HexagonView extends Component {
         highlightColor: [255, 255, 255, 100],
         wireframe: false,
         filled: true,
-        extruded: true,
+        extruded: false,
         material,
         elevationScale: zoom ? 5.0 + 30.0 * (10.0 / zoom) : 5,
         getHexagon: d => d.hex,
+        // getFillColor: d => {
+        getLineWidth: 3,
         getFillColor: d => {
+          if (
+            selectedHex &&
+            selectedHex[0] === 'solid' &&
+            d.hex === selectedHex[1]
+          ) {
+            return [255, 255, 255]
+          } else {
+            const color = colors[d.colorIndex]
+            return [color[0], color[1], color[2], 100]
+          }
+        },
+        getLineColor: d => {
           if (
             selectedHex &&
             selectedHex[0] === 'solid' &&
@@ -129,6 +165,7 @@ export default class H3HexagonView extends Component {
             return colors[d.colorIndex]
           }
         },
+        lineWidthMinPixels: 1,
         getElevation: d => {
           if (
             selectedHex &&
@@ -269,28 +306,6 @@ export default class H3HexagonView extends Component {
             return true
           }
         }
-      }),
-      new MVTLayer({
-        data: `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/{z}/{x}/{y}.vector.pbf?access_token=${MAPBOX_TOKEN}`,
-        // data: `http://localhost:5000/satellite-lowres/{z}/{x}/{y}.pbf`,
-        // data: `http://localhost:5000/canary/{z}/{x}/{y}.pbf`,
-        // data: `http://tile.stamen.com/toner/{z}/{x}/{y}.png`,
-        // data: `http://localhost:5000/world_countries/{z}/{x}/{y}.pbf`,
-        // data: `http://localhost:5000/states_provinces/{z}/{x}/{y}.pbf`,
-        // data: `http://localhost:7000/ne_10m_admin_1_states_provinces.mbtiles/{z}/{x}/{y}.pbf`,
-        // data: `http://localhost:5000/states_provinces_unzipped/{z}/{x}/{y}.pbf`,
-        // data: `https://ipfs.io/ipfs/bafybeigyfjxrsxrlt2emeyvm3gihb7wvkbcqiel7xfa37yf4o4me6phua4/states_provinces/{z}/{x}/{y}.pbf`,
-        // data: `https://ipfs.io/ipfs/QmUefFZttPf9xq4KTkk94rBbZEVrBsTreDi4JA8KYhQFX6/{z}/{x}/{y}`, // IPFS Demo
-
-        minZoom: 0,
-        maxZoom: 23, // MapBox
-        // maxZoom: 5, // states_provinces
-        // maxZoom: 9, // IPFS Demo
-        getLineColor: [192, 192, 192],
-        // getFillColor: [100, 130, 140],
-        getFillColor: [40, 40, 40],
-        getLineWidth: 1,
-        lineWidthMinPixels: 1
       })
     ]
   }

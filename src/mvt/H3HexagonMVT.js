@@ -101,6 +101,7 @@ export default function H3HexagonMVT () {
   }
 
   function pushLatLng (lat, lng) {
+    if (location.pathname !== '/edit') return
     const hex = geoToH3(lat, lng, resolution)
     const colorIndex = nextColor % 10
     const newDataPoint = {
