@@ -241,7 +241,7 @@ export default class H3HexagonView extends Component {
 
   onClick (info) {
     const {
-      lngLat: [lng, lat]
+      coordinate: [lng, lat]
     } = info
     this.props.pushLatLng(lat, lng)
   }
