@@ -141,7 +141,7 @@ export default function H3HexagonMVT () {
           style={{
             position: 'relative',
             width: '100%',
-            height: '80vh',
+            height: '70vh',
             background: '#64828c'
           }}
         >
